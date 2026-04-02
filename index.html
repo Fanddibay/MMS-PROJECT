@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maritime Dashboard Mockup</title>
+
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem("theme");
+      const theme = savedTheme || "dark";
+      document.documentElement.classList.toggle("dark", theme === "dark");
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+
+  <script src="assets/js/tailwind.config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    referrerpolicy="no-referrer"
+  />
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/dashboard.css" />
+</head>
+
+<body class="h-screen overflow-hidden bg-slate-950 text-slate-100">
+  <section id="map" class="absolute inset-0 z-0"></section>
+  <div class="map-vignette pointer-events-none absolute inset-0 z-10"></div>
+
+  <header class="navbar-wrap pointer-events-none absolute left-0 right-0 top-0 z-30 w-full px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3">
+    <div class="pointer-events-auto navbar-inner w-full">
+      <div class="navbar-bar flex flex-wrap items-center gap-2 rounded-2xl px-3 py-2.5 sm:flex-nowrap sm:gap-3 sm:px-4 sm:py-3 md:gap-4 md:px-5 md:py-3">
+        <button id="panelToggle" class="info-pill inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition hover:opacity-90 md:hidden" aria-label="Toggle panel">
+          <i class="fa-solid fa-bars text-sm"></i>
+        </button>
+
+        <div class="navbar-location flex min-w-0 shrink-0 items-center gap-2 sm:gap-2.5 md:min-w-[200px]">
+          <span class="info-pill inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl sm:h-9 sm:w-9">
+            <i class="fa-solid fa-location-dot text-xs"></i>
+          </span>
+          <div class="min-w-0">
+            <p class="navbar-title truncate text-lg font-semibold leading-tight tracking-tight sm:text-xl md:text-2xl">Tanjung Priok Port</p>
+            <p class="mt-0.5 truncate text-xs text-slate-300">Jakarta, Indonesia</p>
+          </div>
+        </div>
+
+        <div class="navbar-search order-3 w-full min-w-0 sm:order-none sm:ml-2 sm:w-[200px] md:w-[240px]">
+          <label class="relative block w-full">
+            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
+            <input type="search" placeholder="Search location" class="search-input w-full rounded-full border py-2.5 pl-4 pr-10 text-sm outline-none transition sm:py-2.5" />
+          </label>
+        </div>
+
+        <div class="navbar-actions ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
+          <div class="info-pill hidden items-center gap-2 rounded-xl px-3 py-2 text-xs sm:flex sm:rounded-2xl md:gap-2.5 md:px-3.5 md:py-2">
+            <i class="fa-regular fa-clock text-[11px] text-slate-400"></i>
+            <div class="min-w-0">
+              <p class="font-semibold leading-tight">07:06 AM</p>
+              <p class="text-[11px] text-slate-300">Wed, Feb 11</p>
+            </div>
+          </div>
+
+          <div class="info-pill hidden items-center gap-2 rounded-xl px-3 py-2 text-xs sm:flex sm:rounded-2xl md:gap-2.5 md:px-3.5 md:py-2">
+            <i class="fa-solid fa-cloud text-[11px] text-slate-400"></i>
+            <div class="min-w-0">
+              <p class="font-semibold leading-tight">27°C</p>
+              <p class="text-[11px] text-slate-300">Partly Cloudy</p>
+            </div>
+          </div>
+
+          <button id="themeToggle" class="info-pill inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition hover:opacity-90 sm:h-10 sm:w-10" aria-label="Toggle theme">
+            <i class="fa-solid fa-moon text-sm"></i>
+          </button>
+
+          <button class="info-pill inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition hover:opacity-90" aria-label="User">
+            <i class="fa-regular fa-user text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <aside id="leftPanel" class="dashboard-left absolute left-3 top-20 z-30 w-[320px] max-w-[86vw] transition-transform duration-300 md:left-5 md:top-24 md:translate-x-0">
+    <!-- Card 1: Info Model -->
+    <div class="panel-card rounded-2xl p-4">
+      <div class="mb-3 flex justify-between border-b border-white/15 pb-2 text-xs">
+        <span class="font-semibold text-slate-100">Info Model</span>
+        <span class="text-slate-400">Status &amp; Waktu</span>
+      </div>
+      <div class="mb-2 flex justify-between text-[11px]">
+        <span class="text-slate-400">Parameter</span>
+        <span class="max-w-[160px] text-right font-semibold text-slate-100">Tinggi Gelombang Signifikan</span>
+      </div>
+      <div class="mb-2 flex justify-between text-[11px]">
+        <span class="text-slate-400">Model</span>
+        <span class="model-pill rounded-full px-2.5 py-1 text-[11px] font-semibold text-white">Inwaves Hires</span>
+      </div>
+      <div class="flex justify-between text-[11px]">
+        <span class="text-slate-400">Waktu valid</span>
+        <span class="font-semibold text-slate-100">03 Feb 2026, 10:00 WIB</span>
+      </div>
+    </div>
+
+    <!-- Card 2: Penjelasan Parameter (tanpa inner card) -->
+    <div class="panel-card mt-3 rounded-2xl p-4">
+      <p class="border-b border-white/15 pb-2 text-xs font-semibold text-slate-200">Penjelasan Parameter</p>
+      <h3 class="mt-2 text-base font-semibold leading-tight text-slate-100">Tinggi Gelombang Angin</h3>
+      <p class="mt-2 text-xs leading-relaxed text-slate-300">
+        Tinggi gelombang yang disebabkan oleh angin lokal. Gelombang ini biasanya lebih pendek dan lebih curam dibandingkan gelombang utama.
+      </p>
+      <p class="mt-3 border-b border-white/15 pb-2 text-xs font-semibold text-slate-200">Penjelasan Parameter</p>
+      <p class="mt-2 text-xs leading-relaxed text-slate-300">
+        Gelombang angin memberikan informasi tentang kondisi laut lokal. Penting untuk aktivitas maritim dekat pantai, perikanan, dan rekreasi laut.
+      </p>
+    </div>
+  </aside>
+
+  <nav class="absolute right-3 top-24 z-30 flex flex-col gap-2 md:right-5" aria-label="Right toolbar">
+    <button class="glass-surface relative inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Notifications">
+      <i class="fa-regular fa-bell"></i>
+      <span class="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">2</span>
+    </button>
+    <button class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Layers"><i class="fa-solid fa-layer-group"></i></button>
+    <button id="crosshairBtn" class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Crosshair" aria-expanded="false"><i class="fa-solid fa-crosshairs"></i></button>
+    <button id="zoomInBtn" class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Zoom in"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+    <button id="zoomOutBtn" class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Zoom out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+    <button class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Toolbar settings"><i class="fa-solid fa-sliders"></i></button>
+  </nav>
+
+  <!-- Figma: Filters + Catalogue overlay (opened by Crosshair button) -->
+  <section id="catalogOverlay" class="catalog-overlay fixed inset-0 z-40 hidden" aria-hidden="true">
+    <div class="catalog-backdrop absolute inset-0" data-overlay-backdrop></div>
+
+    <div class="catalog-shell relative mx-auto mt-16 w-[min(1160px,92vw)] overflow-hidden rounded-2xl border border-white/60 bg-white/70 text-slate-800 shadow-2xl backdrop-blur-xl">
+      <button id="catalogCloseBtn" class="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/50 text-slate-800 transition hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-slate-400/40" type="button" aria-label="Close catalogue">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex min-h-[520px] flex-col md:flex-row">
+        <!-- Left: Filters -->
+        <aside class="catalog-filters w-full border-b border-black/10 bg-white/50 p-5 md:w-[240px] md:border-b-0 md:border-r">
+          <h2 class="text-base font-semibold text-slate-800">Filters</h2>
+
+          <div class="mt-4 space-y-3">
+            <div>
+              <div class="catalog-input flex items-center justify-between rounded-xl border border-black/20 bg-slate-200/60 px-3 py-2">
+                <span class="text-[11px] text-slate-700/80">Free text or ID</span>
+                <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-700/40 text-white">
+                  <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <p class="catalog-label mb-1 text-[11px] font-semibold text-slate-700/90">Variables</p>
+              <div class="catalog-input flex items-center justify-between rounded-xl border border-black/20 bg-slate-200/60 px-3 py-2">
+                <span class="text-[11px] text-slate-700/80">Pick one or more</span>
+                <i class="fa-solid fa-chevron-down text-[10px] text-slate-600/80"></i>
+              </div>
+            </div>
+
+            <div>
+              <p class="catalog-label mb-1 text-[11px] font-semibold text-slate-700/90">Areas</p>
+              <div class="catalog-input flex items-center justify-between rounded-xl border border-black/20 bg-slate-200/60 px-3 py-2">
+                <span class="text-[11px] text-slate-700/80">Pick one or more</span>
+                <i class="fa-solid fa-chevron-down text-[10px] text-slate-600/80"></i>
+              </div>
+            </div>
+
+            <div>
+              <p class="catalog-label mb-1 text-[11px] font-semibold text-slate-700/90">Time Range</p>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="catalog-input flex items-center justify-between rounded-xl border border-black/20 bg-slate-200/60 px-3 py-2">
+                  <span class="text-[11px] text-slate-700/80">DD/MM/YYYY</span>
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-700/40 text-white">
+                    <i class="fa-regular fa-calendar text-[10px]"></i>
+                  </span>
+                </div>
+                <div class="catalog-input flex items-center justify-between rounded-xl border border-black/20 bg-slate-200/60 px-3 py-2">
+                  <span class="text-[11px] text-slate-700/80">DD/MM/YYYY</span>
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-700/40 text-white">
+                    <i class="fa-regular fa-calendar text-[10px]"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right: Catalogue -->
+        <div class="catalog-content flex-1 p-5">
+          <div class="catalog-tabs inline-flex items-center gap-1 rounded-xl bg-slate-200/60 p-1">
+            <button class="catalog-tab is-active rounded-lg px-3 py-1.5 text-xs font-medium" type="button">Marine Service</button>
+            <button class="catalog-tab rounded-lg px-3 py-1.5 text-xs font-medium" type="button">Personal Catalogue</button>
+            <button class="catalog-tab rounded-lg px-3 py-1.5 text-xs font-medium" type="button">Other Providers</button>
+          </div>
+
+          <div class="catalog-scroll mt-5 space-y-6">
+            <section>
+              <h3 class="text-sm font-medium text-slate-800">Most Popular</h3>
+              <div class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <article class="catalog-card">
+                  <img class="catalog-thumb" alt="" src="https://www.figma.com/api/mcp/asset/91401bf6-5b7d-4ac6-9407-8b7b09619455" />
+                  <h4 class="mt-2 text-[11px] font-semibold leading-snug">Global Ocean Physics Analysis and Forecast</h4>
+                  <p class="mt-1 text-[10px] leading-snug text-slate-700/80">We’re excited to introduce Dark Mode for your dashboard. Switch between light and dark themes anytime.</p>
+                </article>
+                <article class="catalog-card">
+                  <img class="catalog-thumb" alt="" src="https://www.figma.com/api/mcp/asset/5f612470-fa52-4769-a87e-63b317184fa0" />
+                  <h4 class="mt-2 text-[11px] font-semibold leading-snug">Global Ocean Physics Analysis and Forecast</h4>
+                  <p class="mt-1 text-[10px] leading-snug text-slate-700/80">We’re excited to introduce Dark Mode for your dashboard. Switch between light and dark themes anytime.</p>
+                </article>
+                <article class="catalog-card">
+                  <img class="catalog-thumb" alt="" src="https://www.figma.com/api/mcp/asset/522cdad9-e7a7-4f7b-8121-d17d8f3734bb" />
+                  <h4 class="mt-2 text-[11px] font-semibold leading-snug">Global Ocean Physics Analysis and Forecast</h4>
+                  <p class="mt-1 text-[10px] leading-snug text-slate-700/80">We’re excited to introduce Dark Mode for your dashboard. Switch between light and dark themes anytime.</p>
+                </article>
+                <article class="catalog-card">
+                  <img class="catalog-thumb" alt="" src="https://www.figma.com/api/mcp/asset/0eb61305-4478-412f-b9c2-4d120977dbad" />
+                  <h4 class="mt-2 text-[11px] font-semibold leading-snug">Global Ocean Biogeochemistry Analysis and Forecast</h4>
+                  <p class="mt-1 text-[10px] leading-snug text-slate-700/80">We’re excited to introduce Dark Mode for your dashboard. Switch between light and dark themes anytime.</p>
+                </article>
+              </div>
+            </section>
+
+            <section>
+              <h3 class="text-sm font-medium text-slate-800">Recently Viewed</h3>
+              <div class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <article class="catalog-card">
+                  <img class="catalog-thumb" alt="" src="https://www.figma.com/api/mcp/asset/91401bf6-5b7d-4ac6-9407-8b7b09619455" />
+                  <h4 class="mt-2 text-[11px] font-semibold leading-snug">Global Ocean Physics Analysis and Forecast</h4>
+                  <p class="mt-1 text-[10px] leading-snug text-slate-700/80">We’re excited to introduce Dark Mode for your dashboard. Switch between light and dark themes anytime.</p>
+                </article>
+                <article class="catalog-card">
+                  <img class="catalog-thumb" alt="" src="https://www.figma.com/api/mcp/asset/5f612470-fa52-4769-a87e-63b317184fa0" />
+                  <h4 class="mt-2 text-[11px] font-semibold leading-snug">Global Ocean Physics Analysis and Forecast</h4>
+                  <p class="mt-1 text-[10px] leading-snug text-slate-700/80">We’re excited to introduce Dark Mode for your dashboard. Switch between light and dark themes anytime.</p>
+                </article>
+                <article class="catalog-card">
+                  <img class="catalog-thumb" alt="" src="https://www.figma.com/api/mcp/asset/522cdad9-e7a7-4f7b-8121-d17d8f3734bb" />
+                  <h4 class="mt-2 text-[11px] font-semibold leading-snug">Global Ocean Physics Analysis and Forecast</h4>
+                  <p class="mt-1 text-[10px] leading-snug text-slate-700/80">We’re excited to introduce Dark Mode for your dashboard. Switch between light and dark themes anytime.</p>
+                </article>
+                <article class="catalog-card">
+                  <img class="catalog-thumb" alt="" src="https://www.figma.com/api/mcp/asset/0eb61305-4478-412f-b9c2-4d120977dbad" />
+                  <h4 class="mt-2 text-[11px] font-semibold leading-snug">Global Ocean Biogeochemistry Analysis and Forecast</h4>
+                  <p class="mt-1 text-[10px] leading-snug text-slate-700/80">We’re excited to introduce Dark Mode for your dashboard. Switch between light and dark themes anytime.</p>
+                </article>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ 
+
+  <footer class="footer-bottom absolute inset-x-0 bottom-0 z-30 flex flex-col items-center pb-3 pt-0 sm:pb-4">
+    <div
+      class="glass-surface pointer-events-none mb-4 ms-auto  justify-end  w-[280px] rounded-2xl border p-3 md:block">
+      <p class="text-xs font-semibold">Penjelasan Parameter</p>
+      <p class="mt-1 text-xs text-slate-300">Knot</p>
+      <div class="knot-gradient mt-2 h-2 w-full rounded-full"></div>
+      <div class="mt-1 flex justify-between text-[10px] text-slate-300">
+        <span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span><span>35</span><span>40</span><span>45</span><span>50</span><span>55</span><span>60</span><span>65</span><span>70</span>
+      </div>
+    </div>
+    <div id="footerInner" class="footer-inner w-full max-w-[1200px] ">
+      <div class="panel-card relative rounded-2xl border">
+        <button id="bottomToggle" class="mid-chevron absolute left-1/2 top-0 z-[9999999999999999999] inline-flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border" type="button" aria-label="Toggle bottom bar" aria-expanded="true">
+          <i id="bottomToggleIcon" class="fa-solid fa-chevron-down text-[10px] transition-transform duration-300"></i>
+        </button>
+
+        <div id="bottomBar" class="bottom-collapsible">
+          <div class="status-strip flex flex-wrap items-center justify-between gap-2 rounded-t-2xl border-b px-4 py-2.5 sm:px-5">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+                <i class="fa-solid fa-anchor text-sm text-white"></i>
+              </span>
+              <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/25">
+                <i class="fa-solid fa-circle-check text-emerald-200"></i>
+              </span>
+              <div>
+                <p class="text-[11px] uppercase tracking-[0.18em]">Maritime Status</p>
+                <p class="text-base font-semibold">Safe to Sail</p>
+              </div>
+            </div>
+            <p class="text-xs">Last Updated <span class="font-semibold">06:22 AM</span></p>
+          </div>
+
+          <div class="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 py-3 sm:gap-4 sm:px-5">
+        <article class="metric-card glass-soft min-w-[188px] snap-start rounded-2xl border p-3">
+          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300">Wave Height Zones</p>
+          <ul class="mt-2 space-y-1 text-xs">
+            <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>Safe (&lt; 2m)</li>
+            <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-orange-400"></span>Caution (2-3m)</li>
+            <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-red-400"></span>Dangerous (&gt; 3m)</li>
+          </ul>
+        </article>
+        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
+          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-wind mr-1 text-[10px]"></i>Wind</p>
+          <p class="mt-2 text-3xl font-semibold leading-none">12</p>
+          <p class="mt-1 text-xs text-slate-300">knots</p>
+        </article>
+        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
+          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-compass mr-1 text-[10px]"></i>Direction</p>
+          <p class="mt-2 text-3xl font-semibold leading-none">ENE</p>
+          <p class="mt-1 text-xs text-slate-300">cardinal</p>
+        </article>
+        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
+          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-water mr-1 text-[10px]"></i>Waves</p>
+          <p class="mt-2 text-3xl font-semibold leading-none">1.8</p>
+          <p class="mt-1 text-xs text-slate-300">meters</p>
+        </article>
+        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
+          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-water-arrow-up-down mr-1 text-[10px]"></i>Tide</p>
+          <p class="mt-2 text-3xl font-semibold leading-none">2.3</p>
+          <p class="mt-1 text-xs text-slate-300">meters</p>
+        </article>
+        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
+          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-temperature-half mr-1 text-[10px]"></i>Temp</p>
+          <p class="mt-2 text-3xl font-semibold leading-none">27</p>
+          <p class="mt-1 text-xs text-slate-300">celsius</p>
+        </article>
+        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
+          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-eye mr-1 text-[10px]"></i>Visibility</p>
+          <p class="mt-2 text-3xl font-semibold leading-none">8.5</p>
+          <p class="mt-1 text-xs text-slate-300">km</p>
+        </article>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-shell mt-2 overflow-x-auto rounded-xl border px-3 py-2">
+        <div class="flex min-w-[940px] items-center gap-2 text-[11px] text-slate-300">
+          <span class="rounded-lg bg-blue-700/80 px-2.5 py-1 text-[10px] font-medium text-white">Rabu 4</span>
+          <span class="timeline-chip">00:00</span><span class="timeline-chip">00:30</span><span class="timeline-chip">01:00</span><span class="timeline-chip">01:30</span>
+          <span class="timeline-chip">02:00</span><span class="timeline-chip">02:30</span><span class="timeline-chip">03:00</span><span class="timeline-chip">03:30</span>
+          <span class="timeline-chip">04:00</span><span class="timeline-chip">04:30</span><span class="timeline-chip">05:00</span><span class="timeline-chip">05:30</span>
+          <span class="timeline-chip">06:00</span><span class="timeline-chip">06:30</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
