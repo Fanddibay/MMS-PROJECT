@@ -1,0 +1,294 @@
+/* ============================================================
+   PAGE: New Role Management — Responsive & Interactive
+   ============================================================ */
+
+/* ---- Category navigation — horizontal on mobile/tablet, sidebar on desktop ---- */
+.perm-category-nav {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    padding: 0 12px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+}
+
+.perm-category-nav::-webkit-scrollbar {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .perm-category-nav {
+        flex-direction: column;
+        width: 297px;
+        flex-shrink: 0;
+        padding: 0;
+        max-height: 561px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scroll-snap-type: none;
+        border-bottom: none;
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
+        background: #fff;
+    }
+}
+
+.perm-cat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #a1a1aa;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    scroll-snap-align: start;
+    white-space: nowrap;
+}
+
+.perm-cat-btn:hover {
+    color: #1a4999;
+}
+
+.perm-cat-btn.active {
+    color: #1a4999;
+    border-bottom-color: #71717a;
+    font-weight: 500;
+}
+
+@media (min-width: 768px) {
+    .perm-cat-btn {
+        width: 100%;
+        padding: 16px 36px;
+        font-size: 16px;
+        border-bottom: none;
+        border-left: 3px solid transparent;
+        justify-content: flex-start;
+    }
+
+    .perm-cat-btn.active {
+        background: #dae8ff;
+        border-bottom-color: transparent;
+        border-left-color: #1a4999;
+    }
+}
+
+/* ---- Permissions table ---- */
+.perm-table-scroll-wrap {
+    position: relative;
+    min-width: 0;
+}
+
+.perm-scroll-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #71717a;
+}
+
+.perm-scroll-hint.is-dismissed {
+    display: none;
+}
+
+.perm-scroll-hint i {
+    font-size: 10px;
+    color: #1a4999;
+    animation: perm-hint-nudge 1.4s ease-in-out infinite;
+}
+
+@keyframes perm-hint-nudge {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+}
+
+@media (min-width: 1024px) {
+    .perm-scroll-hint {
+        display: none;
+    }
+}
+
+.perm-table-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #c4c4c4 transparent;
+}
+
+.perm-table-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.perm-table-scroll::-webkit-scrollbar-track {
+    background: #f4f4f5;
+    border-radius: 0 0 10px 10px;
+}
+
+.perm-table-scroll::-webkit-scrollbar-thumb {
+    background: #a1a1aa;
+    border-radius: 10px;
+}
+
+.perm-table {
+    width: 100%;
+    min-width: 480px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+@media (min-width: 1024px) {
+    .perm-table {
+        min-width: 0;
+    }
+}
+
+.perm-table thead tr {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.perm-table th {
+    padding: 11px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5565;
+    white-space: nowrap;
+}
+
+.perm-table th.perm-col-action {
+    width: 72px;
+    min-width: 72px;
+    text-align: center;
+}
+
+.perm-table th.perm-col-name {
+    min-width: 140px;
+}
+
+@media (min-width: 768px) {
+    .perm-table th {
+        padding: 13px 17px;
+        font-size: 14px;
+    }
+
+    .perm-table th.perm-col-action {
+        width: 157px;
+        min-width: 157px;
+    }
+}
+
+.perm-table td {
+    padding: 12px;
+    font-size: 13px;
+    color: #101828;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+@media (min-width: 768px) {
+    .perm-table td {
+        padding: 14px 17px;
+        font-size: 14px;
+    }
+}
+
+.perm-table td.perm-col-action {
+    text-align: center;
+}
+
+.perm-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.perm-table tbody tr.bg-alt {
+    background: rgba(249, 250, 251, 0.5);
+}
+
+/* Custom Checkbox Design matching Figma's exact size and colors */
+.custom-checkbox-container {
+    display: inline-block;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkbox-checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 16px;
+    width: 16px;
+    background-color: #f3f3f5;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.custom-checkbox-container:hover input ~ .checkbox-checkmark {
+    border-color: #1a4999;
+}
+
+.custom-checkbox-container input:checked ~ .checkbox-checkmark {
+    background-color: #1a4999;
+    border-color: #1a4999;
+}
+
+.checkbox-checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.custom-checkbox-container input:checked ~ .checkbox-checkmark:after {
+    display: block;
+}
+
+.custom-checkbox-container .checkbox-checkmark:after {
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Thin Scrollbar Utility */
+.thin-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+.thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}

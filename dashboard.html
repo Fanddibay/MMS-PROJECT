@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="assets/js/tailwind.config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- Project CSS: Global -->
+    <link rel="stylesheet" href="assets/css/global/variables.css">
+    <link rel="stylesheet" href="assets/css/global/reset.css">
+    <link rel="stylesheet" href="assets/css/global/utilities.css">
+
+    <!-- Project CSS: Components -->
+    <link rel="stylesheet" href="assets/css/components/sidebar.css">
+    <link rel="stylesheet" href="assets/css/components/tables.css">
+    <link rel="stylesheet" href="assets/css/components/badges.css">
+    <link rel="stylesheet" href="assets/css/components/filters.css">
+    <link rel="stylesheet" href="assets/css/components/global-select.css">
+    <link rel="stylesheet" href="assets/css/components/global-multiselect.css">
+</head>
+<body class="flex h-screen overflow-hidden text-slate-800">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity opacity-0 duration-300"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-[256px] h-full bg-[#182168] flex flex-col shrink-0 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-50 md:flex">
+        <div class="sidebar-gradient w-full h-full absolute inset-0 pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col h-full w-full">
+            <!-- Logo -->
+            <div class="pt-[32px] px-[20px] pb-[20px] flex justify-center w-full">
+                <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="h-[56px] w-auto object-contain">
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex-1 px-0 flex flex-col gap-[12px] w-full">
+                <!-- Dashboard Link -->
+                <a href="dashboard.html" class="flex items-center px-[20px] py-[8px] hover:bg-white/10 transition-colors text-white">
+                    <i class="fa-solid fa-home w-[24px] text-center text-[18px]"></i>
+                    <span class="ml-[8px] font-semibold text-[16px]">Dashboard</span>
+                </a>
+
+                <!-- Management Group -->
+                <div class="flex flex-col w-full">
+                    <div id="managementToggle" class="flex items-center justify-between px-[20px] py-[8px] text-white cursor-pointer hover:bg-white/5 transition-colors">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-users w-[24px] text-center text-[18px]"></i>
+                            <span class="ml-[8px] font-semibold text-[16px]">Management</span>
+                        </div>
+                        <i id="managementIcon" class="fa-solid fa-plus text-[14px] transition-transform duration-300"></i>
+                    </div>
+                    
+                    <!-- Sub-links -->
+                    <div id="managementSubMenu" class="flex flex-col items-center gap-[12px] w-full overflow-hidden transition-all duration-300" style="max-height: 0; margin-top: 0;">
+                        <a href="role-management.html" class="w-[216px] py-[8px] px-[36px] text-white text-[16px] hover:bg-white/10 rounded-[8px] transition-colors">
+                            Role Management
+                        </a>
+                        <a href="user-management.html" class="w-[216px] py-[8px] px-[36px] text-white text-[16px] hover:bg-white/10 rounded-[8px] transition-colors">
+                            User Management
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Activity Logs -->
+                <a href="activity-log.html" class="flex items-center px-[20px] py-[8px] text-white hover:bg-white/5 transition-colors">
+                    <i class="fa-solid fa-book w-[24px] text-center text-[18px]"></i>
+                    <span class="ml-[8px] font-semibold text-[16px]">Activity Logs</span>
+                </a>
+            </div>
+
+            <!-- User Profile Bottom -->
+            <div class="px-[20px] pb-[20px] pt-[20px] flex items-center justify-between mt-auto w-full border-t border-white/10">
+                <div class="flex items-center gap-[9px] text-white overflow-hidden">
+                    <div class="w-[32px] h-[32px] rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-user text-[14px]"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-[16px] leading-tight">AdminUser</span>
+                        <span class="text-[14px] leading-tight text-white/70">Admin</span>
+                    </div>
+                </div>
+                <a href="login.html" class="text-white hover:text-red-400 transition-colors p-2" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket text-[18px]"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto bg-[#f9fbfc] relative">
+        <!-- Mobile Header -->
+        <div class="md:hidden flex items-center justify-between p-4 bg-[#182168] text-white">
+            <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="h-8 w-auto">
+            <span class="font-bold">Admin Dashboard</span>
+            <button id="mobileMenuBtn"><i class="fa-solid fa-bars text-xl"></i></button>
+        </div>
+
+        <div class="mx-auto px-[16px] md:px-[32px] py-[21px] flex flex-col gap-[24px]">
+            <!-- Header Area -->
+            <div class="flex justify-between items-center w-full">
+                <h1 class="text-[16px] font-medium text-[#71717a]">Dashboard</h1>
+                
+                <div class="flex items-center gap-[6px]">
+                    <a href="index.html" target="blank_"
+                        class="px-[16px] py-[8px] border border-[#d4d4d8] rounded-[10px] text-[14px] text-[#27272a] hover:bg-gray-50 transition-colors bg-white">
+                        Main Dashboard
+                    </a>
+                    <button class="w-[50px] h-[50px] rounded-[16px] bg-white border border-gray-200 flex items-center justify-center relative hover:bg-gray-50 transition-colors">
+                        <i class="fa-regular fa-bell text-[20px] text-gray-600"></i>
+                        <span class="absolute top-2 right-2 bg-[#fb2c36] text-white text-[10px] font-bold w-[20px] h-[15px] flex items-center justify-center rounded-full">2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-[30px] w-full">
+                <!-- Visits -->
+                <div class="bg-white p-[21px] rounded-[21px] flex flex-col justify-center shadow-sm border border-gray-100">
+                    <span class="text-[#a1a1aa] text-[15px]">Visits</span>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-[#1a4999] text-[36px] font-semibold leading-none">101</span>
+                        <div class="flex items-center gap-1 text-[#166534]">
+                            <span class="text-[12px] font-medium">+11.01%</span>
+                            <i class="fa-solid fa-arrow-trend-up text-[12px]"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- New Users -->
+                <div class="bg-white p-[21px] rounded-[21px] flex flex-col justify-center shadow-sm border border-gray-100">
+                    <span class="text-[#a1a1aa] text-[15px]">New Users</span>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-[#1a4999] text-[36px] font-semibold leading-none">2</span>
+                        <div class="flex items-center gap-1 text-[#991b1b]">
+                            <span class="text-[12px] font-medium">-0.01%</span>
+                            <i class="fa-solid fa-arrow-trend-down text-[12px]"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Active Users -->
+                <div class="bg-white p-[21px] rounded-[21px] flex flex-col justify-center shadow-sm border border-gray-100">
+                    <span class="text-[#a1a1aa] text-[15px]">Active Users</span>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-[#1a4999] text-[36px] font-semibold leading-none">30</span>
+                        <div class="flex items-center gap-1 text-[#166534]">
+                            <span class="text-[12px] font-medium">+11.01%</span>
+                            <i class="fa-solid fa-arrow-trend-up text-[12px]"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="flex flex-col lg:flex-row gap-[24px] w-full">
+                <!-- Line Chart: Total Visits -->
+                <div class="bg-white p-[24px] rounded-[20px] flex-[2] shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-[14px] font-semibold text-[#a1a1aa]">Total Visits</h3>
+                        <div class="flex items-center gap-4 text-[12px]">
+                            <div class="flex items-center gap-2">
+                                <span class="w-[8px] h-[8px] rounded-full bg-[#182168]"></span>
+                                <span>This year</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-[8px] h-[8px] rounded-full bg-[#93c5fd] border border-white"></span>
+                                <span>Last year</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-[240px] w-full relative">
+                        <canvas id="visitsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Donut Chart: User Roles -->
+                <div class="bg-white p-[24px] rounded-[21px] flex-[1] shadow-sm border border-gray-100">
+                    <h3 class="text-[14px] font-semibold text-[#a1a1aa] mb-6">User Roles</h3>
+                    <div class="flex flex-col sm:flex-row items-center gap-6 justify-center">
+                        <div class="w-[150px] h-[150px] relative shrink-0">
+                            <canvas id="rolesChart"></canvas>
+                        </div>
+                        <div class="flex flex-col gap-4 flex-1">
+                            <!-- Legend Items -->
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-[12px] h-[12px] rounded-full bg-[#313b9c]"></span>
+                                    <span class="text-[14px]">Registered User</span>
+                                </div>
+                                <span class="text-[14px] font-medium">52.1%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-[12px] h-[12px] rounded-full bg-[#facc15]"></span>
+                                    <span class="text-[14px]">Forecaster</span>
+                                </div>
+                                <span class="text-[14px] font-medium">22.8%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-[12px] h-[12px] rounded-full bg-[#4ade80]"></span>
+                                    <span class="text-[14px]">Admin</span>
+                                </div>
+                                <span class="text-[14px] font-medium">13.9%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4 mt-4">
+                <div class="flex flex-wrap items-center gap-[12px] w-full md:w-auto">
+                    <div class="flex items-center justify-between w-full md:w-[250px] h-[41px] px-[19px] py-[10px] bg-white border-[1.3px] border-black/10 rounded-[14px]">
+                        <input type="text" id="customSearch" placeholder="Search here" class="bg-transparent border-none outline-none text-[14px] text-[#71717a] placeholder-[#71717a] w-full">
+                        <i class="fa-solid fa-magnifying-glass text-[#71717a] text-[14px] ml-2"></i>
+                    </div>
+                    <div class="relative w-full md:w-[170px]">
+                        <select id="roleFilter" class="w-full h-[41px] pl-[19px] pr-[35px] bg-white border-[1.3px] border-black/10 rounded-[10px] text-[14px] text-[#71717a] appearance-none outline-none cursor-pointer">
+                            <option value="">Filter by Role</option>
+                            <option value="Registered User">Registered User</option>
+                            <option value="Forecaster">Forecaster</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="relative w-full md:w-[170px]">
+                        <select id="statusFilter" class="w-full h-[41px] pl-[19px] pr-[35px] bg-white border-[1.3px] border-black/10 rounded-[10px] text-[14px] text-[#71717a] appearance-none outline-none cursor-pointer">
+                            <option value="">Filter by Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="bg-white border border-[#e5e7eb] rounded-[21px] overflow-hidden mb-10 flex flex-col">
+                <div class="w-full overflow-x-auto">
+                    <table id="usersTable" class="w-full text-left" style="width:100%">
+                        <thead>
+                            <tr class="bg-[#f9fafb] border-b border-[#e5e7eb]">
+                                <th class="pl-[32px] py-[15px] text-[16px] font-bold text-[#a1a1aa] w-[25%] whitespace-nowrap">Username</th>
+                                <th class="py-[15px] text-[16px] font-bold text-[#a1a1aa] w-[30%] whitespace-nowrap">E-mail</th>
+                                <th class="py-[15px] text-[16px] font-bold text-[#a1a1aa] w-[20%] whitespace-nowrap">Role</th>
+                                <th class="py-[15px] text-[16px] font-bold text-[#a1a1aa] w-[15%] whitespace-nowrap">Status</th>
+                                <th class="pr-[32px] py-[15px] w-[10%] text-center"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="h-[45px]">
+                                <td class="pl-[32px]">
+                                    <a href="#" class="text-[#1a4999] font-medium text-[14px] underline underline-offset-2">BMKG_USER1</a>
+                                </td>
+                                <td class="text-[#27272a] text-[14px]">user1@gmail.com</td>
+                                <td class="text-[#27272a] text-[14px]">Registered User</td>
+                                <td>
+                                    <span class="inline-flex items-center gap-[6px] px-[10px] py-[2px] rounded-[10px] bg-[#dcfce7] text-[#166534] text-[12px] font-medium">
+                                        <span class="w-[9px] h-[9px] rounded-full bg-[#166534]"></span>
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="text-right pr-[32px]">
+                                    <div class="flex items-center justify-end gap-[16px]">
+                                        <button class="text-gray-400 hover:text-[#1a4999] transition-colors"><i class="fa-solid fa-pen"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="bg-[#f9fafb] h-[45px]">
+                                <td class="pl-[32px]">
+                                    <a href="#" class="text-[#1a4999] font-medium text-[14px] underline underline-offset-2">BMKG_USER3</a>
+                                </td>
+                                <td class="text-[#27272a] text-[14px]">user3@gmail.com</td>
+                                <td class="text-[#27272a] text-[14px]">Forecaster</td>
+                                <td>
+                                    <span class="inline-flex items-center gap-[6px] px-[10px] py-[2px] rounded-[10px] bg-[#fee2e2] text-[#991b1b] text-[12px] font-medium">
+                                        <span class="w-[9px] h-[9px] rounded-full bg-[#991b1b]"></span>
+                                        Inactive
+                                    </span>
+                                </td>
+                                <td class="text-right pr-[32px]">
+                                    <div class="flex items-center justify-end gap-[16px]">
+                                        <button class="text-gray-400 hover:text-[#1a4999] transition-colors"><i class="fa-solid fa-pen"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="h-[45px]">
+                                <td class="pl-[32px]">
+                                    <a href="#" class="text-[#1a4999] font-medium text-[14px] underline underline-offset-2">BMKG_USER4</a>
+                                </td>
+                                <td class="text-[#27272a] text-[14px]">user4@gmail.com</td>
+                                <td class="text-[#27272a] text-[14px]">Forecaster</td>
+                                <td>
+                                    <span class="inline-flex items-center gap-[6px] px-[10px] py-[2px] rounded-[10px] bg-[#dcfce7] text-[#166534] text-[12px] font-medium">
+                                        <span class="w-[9px] h-[9px] rounded-full bg-[#166534]"></span>
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="text-right pr-[32px]">
+                                    <div class="flex items-center justify-end gap-[16px]">
+                                        <button class="text-gray-400 hover:text-[#1a4999] transition-colors"><i class="fa-solid fa-pen"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="bg-[#f9fafb] h-[45px]">
+                                <td class="pl-[32px]">
+                                    <a href="#" class="text-[#1a4999] font-medium text-[14px] underline underline-offset-2">BMKG_USER5</a>
+                                </td>
+                                <td class="text-[#27272a] text-[14px]">user5@gmail.com</td>
+                                <td class="text-[#27272a] text-[14px]">Admin</td>
+                                <td>
+                                    <span class="inline-flex items-center gap-[6px] px-[10px] py-[2px] rounded-[10px] bg-[#dcfce7] text-[#166534] text-[12px] font-medium">
+                                        <span class="w-[9px] h-[9px] rounded-full bg-[#166534]"></span>
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="text-right pr-[32px]">
+                                    <div class="flex items-center justify-end gap-[16px]">
+                                        <button class="text-gray-400 hover:text-[#1a4999] transition-colors"><i class="fa-solid fa-pen"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="h-[45px]">
+                                <td class="pl-[32px]">
+                                    <a href="#" class="text-[#1a4999] font-medium text-[14px] underline underline-offset-2">BMKG_USER2</a>
+                                </td>
+                                <td class="text-[#27272a] text-[14px]">user2@gmail.com</td>
+                                <td class="text-[#27272a] text-[14px]">Forecaster</td>
+                                <td>
+                                    <span class="inline-flex items-center gap-[6px] px-[10px] py-[2px] rounded-[10px] bg-[#fee2e2] text-[#991b1b] text-[12px] font-medium">
+                                        <span class="w-[9px] h-[9px] rounded-full bg-[#991b1b]"></span>
+                                        Inactive
+                                    </span>
+                                </td>
+                                <td class="text-right pr-[32px]">
+                                    <div class="flex items-center justify-end gap-[16px]">
+                                        <button class="text-gray-400 hover:text-[#1a4999] transition-colors"><i class="fa-solid fa-pen"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="tableFooter" class="px-[24px] py-[16px] flex justify-between items-center bg-white border-t border-[#e5e7eb]">
+                    <!-- Paginate and Info will be moved here by JS -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Project JS: Components -->
+    <script src="assets/js/components/sidebar.js"></script>
+    <script src="assets/js/components/data-table.js"></script>
+    <script src="assets/js/components/global-select.js"></script>
+    <script src="assets/js/components/global-multiselect.js"></script>
+
+    <!-- Project JS: Page -->
+    <script src="assets/js/pages/admin-dashboard.js"></script>
+</body>
+</html>

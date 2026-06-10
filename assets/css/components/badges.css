@@ -1,0 +1,62 @@
+/* ============================================================
+   COMPONENT: Status Badges
+   
+   Used on: dashboard, user-management, activity-log,
+   view-audit, view-role-management, viewUser.
+   
+   Angular Component: BadgeComponent
+   ============================================================ */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    line-height: 1;
+}
+
+.status-badge--pill {
+    border-radius: var(--radius-full);
+    padding: 4px 12px;
+}
+
+/* ---- Active ---- */
+.status-badge--active,
+.status-badge.active {
+    background-color: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.status-badge--active .status-dot,
+.status-badge.active .status-dot {
+    background-color: var(--color-success);
+}
+
+/* ---- Inactive ---- */
+.status-badge--inactive,
+.status-badge.inactive {
+    background-color: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.status-badge--inactive .status-dot,
+.status-badge.inactive .status-dot {
+    background-color: var(--color-danger);
+}
+
+/* ---- Status Dot ---- */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+/* Larger dot variant (9px, used in some pages) */
+.status-dot--lg {
+    width: 9px;
+    height: 9px;
+}

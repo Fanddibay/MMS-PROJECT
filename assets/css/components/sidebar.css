@@ -1,0 +1,279 @@
+/* ============================================================
+   COMPONENT: Admin Sidebar
+   
+   Used on: All admin pages (dashboard, user-management, 
+   role-management, activity-log, etc.)
+   
+   Angular Component: SidebarComponent
+   ============================================================ */
+
+/* ---- Sidebar Container ---- */
+.admin-sidebar {
+    width: var(--sidebar-width);
+    height: 100%;
+    background-color: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    z-index: var(--z-sidebar);
+}
+
+/* Static sidebar: hidden on mobile, visible on desktop */
+.admin-sidebar--static {
+    display: none;
+}
+
+/* Drawer sidebar: fixed positioning for mobile slide-in */
+.admin-sidebar--drawer {
+    position: fixed;
+    inset: 0 auto 0 0;
+    transform: translateX(-100%);
+    transition: transform var(--transition-sidebar);
+    z-index: var(--z-sidebar);
+}
+
+.admin-sidebar--drawer.is-open {
+    transform: translateX(0);
+}
+
+@media (min-width: 768px) {
+    .admin-sidebar--static {
+        display: flex;
+    }
+    .admin-sidebar--drawer {
+        position: relative;
+        transform: translateX(0);
+    }
+}
+
+/* ---- Sidebar Gradient Overlay ---- */
+.admin-sidebar__gradient {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--sidebar-gradient);
+}
+
+/* ---- Sidebar Inner (above gradient) ---- */
+.admin-sidebar__inner {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+/* ---- Logo Area ---- */
+.admin-sidebar__logo {
+    padding: var(--space-3xl) var(--space-xl) var(--space-xl);
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.admin-sidebar__logo img {
+    height: 56px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* ---- Navigation ---- */
+.admin-sidebar__nav {
+    flex: 1;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    width: 100%;
+}
+
+/* ---- Nav Link (top-level) ---- */
+.admin-sidebar__link {
+    display: flex;
+    align-items: center;
+    padding: var(--space-sm) var(--space-xl);
+    color: var(--color-text-white);
+    transition: background-color var(--transition-fast);
+    text-decoration: none;
+}
+
+.admin-sidebar__link:hover {
+    background-color: var(--sidebar-hover-bg);
+}
+
+.admin-sidebar__link.is-active {
+    background-color: var(--sidebar-active-bg);
+}
+
+.admin-sidebar__link-icon {
+    width: 24px;
+    text-align: center;
+    font-size: var(--font-size-lg);
+}
+
+.admin-sidebar__link-text {
+    margin-left: var(--space-sm);
+    font-weight: 600;
+    font-size: var(--font-size-md);
+}
+
+/* ---- Collapsible Group (Management) ---- */
+.admin-sidebar__group-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-xl);
+    color: var(--color-text-white);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.admin-sidebar__group-toggle:hover {
+    background-color: var(--sidebar-hover-bg);
+}
+
+.admin-sidebar__group-toggle.is-active {
+    background-color: var(--sidebar-hover-bg);
+}
+
+.admin-sidebar__group-icon {
+    font-size: var(--font-size-base);
+    transition: transform var(--transition-slow);
+}
+
+/* ---- Sub-Menu ---- */
+.admin-sidebar__submenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+    width: 100%;
+    overflow: hidden;
+    transition: max-height var(--transition-slow), margin-top var(--transition-slow);
+}
+
+.admin-sidebar__submenu.is-collapsed {
+    max-height: 0 !important;
+    margin-top: 0 !important;
+}
+
+.admin-sidebar__sublink {
+    width: 216px;
+    padding: var(--space-sm) 36px;
+    color: var(--color-text-white);
+    font-size: var(--font-size-md);
+    border-radius: var(--radius-sidebar-item);
+    transition: background-color var(--transition-fast);
+    text-decoration: none;
+}
+
+.admin-sidebar__sublink:hover {
+    background-color: var(--sidebar-submenu-hover);
+}
+
+.admin-sidebar__sublink.is-active {
+    background-color: var(--sidebar-active-bg);
+}
+
+/* ---- User Profile (bottom) ---- */
+.admin-sidebar__profile {
+    padding: var(--space-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar__profile-info {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--color-text-white);
+    overflow: hidden;
+}
+
+.admin-sidebar__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.admin-sidebar__avatar i {
+    font-size: var(--font-size-base);
+}
+
+.admin-sidebar__username {
+    font-weight: 700;
+    font-size: var(--font-size-md);
+    line-height: 1.2;
+}
+
+.admin-sidebar__role {
+    font-size: var(--font-size-base);
+    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.admin-sidebar__logout {
+    color: var(--color-text-white);
+    padding: var(--space-sm);
+    transition: color var(--transition-fast);
+}
+
+.admin-sidebar__logout:hover {
+    color: #f87171;
+}
+
+/* ---- Mobile Sidebar Backdrop ---- */
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-sidebar-backdrop);
+    transition: opacity var(--transition-slow);
+}
+
+.sidebar-backdrop.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ---- Mobile Header Bar ---- */
+.mobile-header {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg);
+    background-color: var(--sidebar-bg);
+    color: var(--color-text-white);
+}
+
+@media (max-width: 767px) {
+    .mobile-header {
+        display: flex;
+    }
+}
+
+.mobile-header__logo {
+    height: 32px;
+    width: auto;
+}
+
+.mobile-header__title {
+    font-weight: 700;
+}
+
+.mobile-header__toggle {
+    color: var(--color-text-white);
+    font-size: var(--font-size-xl);
+}

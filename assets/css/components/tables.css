@@ -1,0 +1,153 @@
+/* ============================================================
+   COMPONENT: DataTables Overrides
+   
+   Unified DataTables styling to match the Figma design.
+   Used on: dashboard, user-management, role-management,
+   activity-log, view-audit, view-role-management.
+   
+   Angular Component: DataTableComponent
+   ============================================================ */
+
+/* ---- Hide default DataTables filter (we use custom) ---- */
+.dataTables_wrapper .dataTables_filter {
+    display: none;
+}
+
+/* ---- Base Table ---- */
+table.dataTable {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+    border: none !important;
+}
+
+/* ---- Table Head ---- */
+table.dataTable thead th {
+    background-color: var(--color-bg-table-header);
+    color: var(--color-text-muted);
+    font-weight: 700;
+    font-size: var(--font-size-md);
+    padding: 12px 32px !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    border-top: none !important;
+    text-align: left;
+}
+
+/* ---- Table Body ---- */
+table.dataTable tbody td {
+    padding: 12px 32px !important;
+    border-bottom: 1px solid var(--color-border-light) !important;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-base);
+    vertical-align: middle;
+}
+
+table.dataTable tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* ---- Zebra Striping ---- */
+table.dataTable tbody tr:nth-child(even) {
+    background-color: var(--color-bg-table-alt);
+}
+
+/* ---- No Footer Border ---- */
+table.dataTable.no-footer {
+    border-bottom: none !important;
+}
+
+/* ---- Username / Role Name Links ---- */
+.table-link {
+    color: var(--color-text-link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.table-link:hover {
+    color: var(--color-primary-dark);
+}
+
+/* Backwards compat: .username-link, .role-name-link */
+.username-link,
+.role-name-link {
+    color: var(--color-text-link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 500;
+}
+
+/* ---- DataTables Info ---- */
+.dataTables_info {
+    color: var(--color-text-muted) !important;
+    font-size: var(--font-size-md) !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* ---- DataTables Pagination ---- */
+.dataTables_paginate {
+    display: flex !important;
+    align-items: center !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.dataTables_paginate .paginate_button {
+    border: 1px solid var(--color-border-button) !important;
+    padding: 8px 16px !important;
+    margin-left: -1px !important;
+    font-size: var(--font-size-base) !important;
+    background: var(--color-bg-card) !important;
+    color: var(--color-text-primary) !important;
+    border-radius: 0 !important;
+    cursor: pointer;
+}
+
+.dataTables_paginate .paginate_button:first-child {
+    border-top-left-radius: var(--radius-sm) !important;
+    border-bottom-left-radius: var(--radius-sm) !important;
+    margin-left: 0 !important;
+}
+
+.dataTables_paginate .paginate_button:last-child {
+    border-top-right-radius: var(--radius-sm) !important;
+    border-bottom-right-radius: var(--radius-sm) !important;
+}
+
+.dataTables_paginate .paginate_button.current {
+    background: var(--color-primary) !important;
+    color: var(--color-text-white) !important;
+    border-color: var(--color-primary) !important;
+    z-index: 1;
+    position: relative;
+}
+
+.dataTables_paginate .paginate_button:hover:not(.current) {
+    background: #F4F4F5 !important;
+}
+
+/* ---- Table Card Wrapper ---- */
+.table-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+}
+
+.table-card__body {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-card__footer {
+    padding: var(--space-lg) var(--space-2xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--color-bg-card);
+    border-top: 1px solid var(--color-border);
+}

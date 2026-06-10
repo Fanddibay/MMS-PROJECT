@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View User Details - Admin</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="assets/js/tailwind.config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Project CSS: Global -->
+    <link rel="stylesheet" href="assets/css/global/variables.css">
+    <link rel="stylesheet" href="assets/css/global/reset.css">
+    <link rel="stylesheet" href="assets/css/global/utilities.css">
+
+    <!-- Project CSS: Components -->
+    <link rel="stylesheet" href="assets/css/components/sidebar.css">
+    <link rel="stylesheet" href="assets/css/components/modals.css">
+</head>
+<body class="flex h-screen overflow-hidden text-slate-800">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity opacity-0 duration-300"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-[256px] h-full bg-[#182168] flex flex-col shrink-0 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-50 md:flex">
+        <div class="sidebar-gradient w-full h-full absolute inset-0 pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col h-full w-full">
+            <!-- Logo -->
+            <div class="pt-[32px] px-[20px] pb-[20px] flex justify-center w-full">
+                <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="h-[56px] w-auto object-contain">
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex-1 px-0 flex flex-col gap-[12px] w-full">
+                <!-- Dashboard Link -->
+                <a href="dashboard.html" class="flex items-center px-[20px] py-[8px] hover:bg-white/10 transition-colors text-white">
+                    <i class="fa-solid fa-home w-[24px] text-center text-[18px]"></i>
+                    <span class="ml-[8px] font-semibold text-[16px]">Dashboard</span>
+                </a>
+
+                <!-- Management Group -->
+                <div class="flex flex-col w-full">
+                    <div id="managementToggle" class="flex items-center justify-between px-[20px] py-[8px] text-white cursor-pointer hover:bg-white/5 transition-colors">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-users w-[24px] text-center text-[18px]"></i>
+                            <span class="ml-[8px] font-semibold text-[16px]">Management</span>
+                        </div>
+                        <i id="managementIcon" class="fa-solid fa-plus text-[14px] transition-transform duration-300"></i>
+                    </div>
+                    
+                    <!-- Sub-links -->
+                    <div id="managementSubMenu" class="flex flex-col items-center gap-[12px] w-full overflow-hidden transition-all duration-300" style="max-height: 0; margin-top: 0;">
+                        <a href="role-management.html" class="w-[216px] py-[8px] px-[36px] text-white text-[16px] hover:bg-white/10 rounded-[8px] transition-colors">
+                            Role Management
+                        </a>
+                        <a href="user-management.html" class="w-[216px] py-[8px] px-[36px] text-white text-[16px] hover:bg-white/10 rounded-[8px] transition-colors">
+                            User Management
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Activity Logs -->
+                <a href="activity-log.html" class="flex items-center px-[20px] py-[8px] text-white hover:bg-white/5 transition-colors">
+                    <i class="fa-solid fa-book w-[24px] text-center text-[18px]"></i>
+                    <span class="ml-[8px] font-semibold text-[16px]">Activity Logs</span>
+                </a>
+            </div>
+
+            <!-- User Profile Bottom -->
+            <div class="px-[20px] pb-[20px] pt-[20px] flex items-center justify-between mt-auto w-full border-t border-white/10">
+                <div class="flex items-center gap-[9px] text-white overflow-hidden">
+                    <div class="w-[32px] h-[32px] rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-user text-[14px]"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-[16px] leading-tight">AdminUser</span>
+                        <span class="text-[14px] leading-tight text-white/70">Admin</span>
+                    </div>
+                </div>
+                <a href="login.html" class="text-white hover:text-red-400 transition-colors p-2" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket text-[18px]"></i>
+                </a>
+            </div>
+        </div>
+    </aside>    
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto bg-[#f9fbfc] relative">
+        <!-- Mobile Header -->
+        <div class="md:hidden flex items-center justify-between p-4 bg-[#182168] text-white">
+            <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="h-8 w-auto">
+            <span class="font-bold">View Details</span>
+            <button id="mobileMenuBtn"><i class="fa-solid fa-bars text-xl"></i></button>
+        </div>
+
+        <div class="mx-auto px-[16px] md:px-[32px] py-[21px] flex flex-col gap-[24px]">
+            <!-- Header Area -->
+            <div class="flex flex-col md:flex-row gap-3 justify-between items-start md:items-center w-full">
+                <div class="flex flex-wrap items-center text-[14px] md:text-[16px] font-medium text-[#71717a] gap-y-1">
+                    <span>Management</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] md:text-[12px] mx-[6px] md:mx-[8px]"></i>
+                    <span>User Management</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] md:text-[12px] mx-[6px] md:mx-[8px]"></i>
+                    <span class="text-[#4658ac]">View User Details</span>
+                </div>
+                
+                <div class="flex items-center gap-[6px] w-full md:w-auto justify-between md:justify-end">
+                    <a href="index.html" target="blank_"
+                        class="px-[16px] py-[8px] border border-[#d4d4d8] rounded-[10px] text-[14px] text-[#27272a] hover:bg-gray-50 transition-colors bg-white">
+                        Main Dashboard
+                    </a>
+                    <button class="w-[50px] h-[50px] rounded-[16px] bg-white border border-gray-200 flex items-center justify-center relative hover:bg-gray-50 transition-colors">
+                        <i class="fa-regular fa-bell text-[20px] text-gray-600"></i>
+                        <span class="absolute top-2 right-2 bg-[#fb2c36] text-white text-[10px] font-bold w-[20px] h-[15px] flex items-center justify-center rounded-full">2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Title Area -->
+            <div class="border-b border-[#71717a]/50 pb-[12px] flex flex-col gap-[12px]">
+                <h1 class="text-[24px] font-semibold text-black">View Details</h1>
+                <p class="text-[16px] font-normal text-[#71717a]">View details or edit them.</p>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="flex flex-col gap-[21px] w-full mb-10">
+                
+                <!-- Profile Header Card -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[24px] md:py-[32px] md:px-[24px] flex items-center gap-[24px] w-full shadow-sm">
+                    <div class="w-[83px] h-[83px] rounded-full bg-[#1a4999]/10 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-[#1a4999] text-[40px]"></i>
+                    </div>
+                    <div class="flex flex-col gap-[6px]">
+                        <div class="flex items-center gap-[8px]">
+                            <h2 class="text-[20px] font-bold text-[#1a4999]">BMKG_USER1</h2>
+                            <button onclick="window.location.href='edit-user.html'" class="text-gray-400 hover:text-[#1a4999] transition-colors">
+                                <i class="fa-solid fa-pen text-[16px]"></i>
+                            </button>
+                        </div>
+                        <p class="text-[15px] font-semibold text-[#898989]">Forecaster</p>
+                        <div class="inline-flex items-center gap-[6px] px-[10px] py-[2px] rounded-[10px] bg-[#dcfce7] text-[#166534] text-[12px] font-medium w-fit">
+                            <span class="w-[9px] h-[9px] rounded-full bg-[#166534]"></span>
+                            Active
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: User Details -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[24px] flex flex-col gap-[24px] w-full shadow-sm">
+                    <div class="border-b border-black/10 pb-[12px] w-full">
+                        <h2 class="text-[16px] font-normal text-[#71717a]">User Details</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-[24px] gap-x-[52px]">
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">First Name</p>
+                            <p class="text-[16px] text-[#27272a] font-medium">John</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">Last Name</p>
+                            <p class="text-[16px] text-[#27272a] font-medium">Doe</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">Gender</p>
+                            <p class="text-[16px] text-[#27272a] font-medium">Male</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">Last Education</p>
+                            <p class="text-[14px] text-[#18181b] font-medium">Masters' Degree</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">University Name</p>
+                            <p class="text-[14px] text-[#18181b] font-medium">University A</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">Major</p>
+                            <p class="text-[14px] text-[#18181b] font-medium">Meteorology</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">Job Title</p>
+                            <p class="text-[14px] text-[#18181b] font-medium">Meteorological Forecaster</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">Institution</p>
+                            <p class="text-[14px] text-[#18181b] font-medium">BMKG</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Account & Security -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[24px] flex flex-col gap-[24px] w-full shadow-sm">
+                    <div class="border-b border-black/10 pb-[12px] w-full">
+                        <h2 class="text-[16px] font-normal text-[#71717a]">Account & Security</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">Username</p>
+                            <p class="text-[14px] text-[#18181b] font-medium">BMKG_USER1</p>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <p class="text-[16px] text-[#71717a]">Email</p>
+                            <p class="text-[14px] text-[#18181b] font-medium">user1@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center gap-[24px] pt-4 border-t border-gray-50">
+                        <div class="flex-1 pr-[24px] border-r border-[#b8b8bc] hidden md:block">
+                            <p class="text-[16px] text-[#71717a]">Reset this user's password. They'll receive instructions to create a new one.</p>
+                        </div>
+                        <div class="w-full md:w-auto">
+                            <button style="border: 1px solid #d4d4d8;" class="w-full md:w-[250px] h-[48px] border border-[#d4d4d8] rounded-[10px] flex items-center justify-center gap-[8px] text-[18px] text-[#27272a] hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-arrow-rotate-right text-[18px]"></i>
+                                Reset Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: User Role -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[24px] flex flex-col gap-[12px] w-full shadow-sm">
+                    <div class="border-b border-black/10 pb-[12px] w-full">
+                        <h2 class="text-[16px] font-normal text-[#71717a]">User Role</h2>
+                    </div>
+                    <p class="text-[14px] text-[#18181b] font-medium">Forecaster</p>
+                </div>
+
+                <!-- Section: Activity Logs -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[24px] flex flex-col gap-[24px] w-full shadow-sm">
+                    <div class="border-b border-black/10 pb-[12px] flex justify-between items-center w-full">
+                        <h2 class="text-[16px] font-normal text-[#71717a]">Activity Logs</h2>
+                        <div class="flex items-center gap-[8px]">
+                            <a href="view-audit.html" class="border border-[#d4d4d8] rounded-[10px] h-[30px] px-[16px] flex items-center justify-center text-[14px] font-normal text-[#27272a] hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                View User Activity
+                            </a>
+                            <button style="border: 1px solid #d4d4d8;" class="border border-[#d4d4d8] rounded-[10px] h-[30px] px-[16px] flex items-center justify-center gap-[8px] text-[14px] font-normal text-[#27272a] hover:bg-gray-50 transition-colors whitespace-nowrap">
+                                <i class="fa-solid fa-download text-[14px]"></i>
+                                Export Data
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-[24px] items-start md:items-stretch">
+                        <div class="flex-1 md:max-w-[488px] md:pr-[24px] md:border-r border-[#b8b8bc] flex items-center">
+                            <p class="text-[16px] text-[#71717a] leading-relaxed">Activity logs detailing when the account was created, login timestamps, and possible lifecycles of the account.</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-[24px] md:gap-[40px] items-start justify-between flex-1 md:pl-[24px]">
+                            <div class="flex flex-col gap-[8px] flex-1">
+                                <p class="text-[16px] text-[#71717a]">Status</p>
+                                <p class="text-[14px] text-[#18181b] font-medium">Active</p>
+                            </div>
+                            <div class="flex flex-col gap-[8px] md:w-[190.5px] shrink-0">
+                                <p class="text-[16px] text-[#71717a]">Last Login</p>
+                                <p class="text-[14px] text-[#18181b] font-medium">05 May 2026, 10:32:03 AM</p>
+                            </div>
+                            <div class="flex flex-col gap-[8px] md:w-[155px] shrink-0">
+                                <p class="text-[16px] text-[#71717a]">Account Created</p>
+                                <p class="text-[14px] text-[#18181b] font-medium">03 January 2026</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Account Settings -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[24px] flex flex-col gap-[24px] w-full shadow-sm mb-10">
+                    <div class="border-b border-black/10 pb-[12px] w-full">
+                        <h2 class="text-[16px] font-normal text-[#71717a]">Account Settings</h2>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center gap-[24px]">
+                        <div class="flex-1 md:pr-[24px] md:border-r border-[#b8b8bc]">
+                            <p class="text-[16px] text-[#71717a]">Admins has the ability to suspend an account. Please contact your Super Admin if you need to deactivate an account.</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-[8px] w-full md:w-auto">
+                            <button style="border: 1px solid #D4D4D8;" onclick="openSuspendModal('BMKG_USER1')" class="flex-1 md:w-[180px] h-[48px] border border-[#D4D4D8] rounded-[10px] text-[18px] text-[#27272a] hover:bg-gray-50 transition-colors">
+                                Suspend Account
+                            </button>
+                            <button onclick="openDeleteModal('BMKG_USER1')" class="flex-1 md:w-[180px] h-[48px] border bg-[#fb2c36] text-[#fff] rounded-[10px] text-[18px] hover:bg-red-700 transition-colors">
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Delete Account Modal -->
+    <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeDeleteModal()"></div>
+        <div class="relative bg-white rounded-[21px] p-6 md:px-[49px] md:py-[32px] w-full max-w-[772px] shadow-2xl transition-all transform scale-95 opacity-0 duration-300" id="deleteModalContent">
+            <div class="flex flex-col md:flex-row gap-[21px] items-start">
+                <div class="w-[82px] h-[81px] bg-red-50 rounded-full flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-circle-exclamation text-red-500 text-[40px]"></i>
+                </div>
+                <div class="flex-1 flex flex-col gap-[6px]">
+                    <h3 class="text-[20px] font-bold text-black">Delete account?</h3>
+                    <p class="text-[16px] text-[#18181b] leading-relaxed">
+                        All data associated with this account will be permanently deleted. This action cannot be reversed.
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-[8px] mt-[32px]">
+                <button onclick="closeDeleteModal()" class="px-[24px] py-[8px] border border-[#d4d4d8] rounded-[10px] text-[12px] font-normal text-[#27272a] hover:bg-gray-50 transition-colors">
+                    No, Go Back
+                </button>
+                <button onclick="confirmDelete()" class="px-[24px] py-[8px] bg-[#fb2c36] text-white rounded-[10px] text-[12px] font-semibold hover:bg-[#d9262e] transition-colors">
+                    Yes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suspend Account Modal -->
+    <div id="suspendModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeSuspendModal()"></div>
+        <div class="relative bg-white rounded-[21px] p-6 md:px-[49px] md:py-[32px] w-full max-w-[772px] shadow-2xl transition-all transform scale-95 opacity-0 duration-300" id="suspendModalContent">
+            <div class="flex flex-col gap-6">
+                <h3 class="text-[20px] font-bold text-black">Suspend Account</h3>
+                <div class="flex flex-col gap-[21px]">
+                    <p class="text-[16px] text-[#18181b] leading-relaxed">
+                        Suspending an account results in a temporary cessation of access to the platform. Account reactivation is possible at any time, allowing for the restoration of all prior settings.
+                    </p>
+                    <div class="flex flex-col gap-[8px]">
+                        <label class="text-[16px] text-[#71717a]">Kindly provide the justification for the suspension of this account.</label>
+                        <textarea id="suspendJustification" placeholder="Insert justification" class="w-full h-[89px] border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] text-[#27272a] focus:outline-none focus:ring-1 focus:ring-[#1a4999] transition-all resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-[8px] mt-[32px]">
+                <button onclick="closeSuspendModal()" class="px-[24px] py-[8px] border border-[#d4d4d8] rounded-[10px] text-[12px] font-normal text-[#27272a] hover:bg-gray-50 transition-colors">
+                    Cancel
+                </button>
+                <button id="confirmSuspendBtn" onclick="confirmSuspend()" disabled class="px-[24px] py-[8px] bg-[#d9d9d9] text-[#b3b3b3] rounded-[10px] text-[12px] font-semibold transition-colors cursor-not-allowed">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialization Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Project JS: Components -->
+    <script src="assets/js/components/sidebar.js"></script>
+    <script src="assets/js/components/modal.js"></script>
+
+    <!-- Project JS: Page -->
+    <script src="assets/js/pages/view-user.js"></script>
+</body>
+</html>

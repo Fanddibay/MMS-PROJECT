@@ -1,0 +1,91 @@
+/* ============================================================
+   COMPONENT: Filter Bar
+   
+   Shared search inputs, filter selects, and filter layout.
+   Used on: dashboard, user-management, role-management,
+   activity-log, view-audit.
+   
+   Angular Component: FilterBarComponent
+   ============================================================ */
+
+/* ---- Filter Input ---- */
+.filter-input {
+    border: 1.3px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 10px 19px;
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-card);
+    outline: none;
+    width: 300px;
+    transition: border-color var(--transition-fast);
+}
+
+.filter-input:focus {
+    border-color: var(--color-primary);
+    scroll-margin: 0;
+}
+
+/* Backwards compatibility */
+.custom-filter-input {
+    border: 1.3px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 10px 19px;
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-card);
+    outline: none;
+    width: 300px;
+    transition: border-color var(--transition-fast);
+}
+
+.custom-filter-input:focus {
+    border-color: var(--color-primary);
+}
+
+/* ---- Filter Select ---- */
+.filter-select {
+    border: 1.3px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: 10px 19px;
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-card);
+    outline: none;
+    width: 170px;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    transition: border-color var(--transition-fast);
+}
+
+.filter-select:focus {
+    border-color: var(--color-primary);
+    scroll-margin: 0;
+}
+
+/* Backwards compatibility */
+.custom-filter-select {
+    border: 1.3px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    padding: 10px 19px;
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-card);
+    outline: none;
+    width: 170px;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    transition: border-color var(--transition-fast);
+}
+
+.custom-filter-select:focus {
+    border-color: var(--color-primary);
+}

@@ -1,0 +1,127 @@
+/* ============================================================
+   COMPONENT: Modals
+   
+   Reusable modal styling for delete, suspend, and confirm
+   dialogs. Used on: user-management, viewUser.
+   
+   Angular Component: ModalComponent
+   ============================================================ */
+
+/* ---- Modal Overlay ---- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+}
+
+.modal-overlay.is-hidden {
+    display: none;
+}
+
+/* ---- Modal Backdrop ---- */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: opacity var(--transition-slow);
+}
+
+/* ---- Modal Content ---- */
+.modal-content {
+    position: relative;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-card);
+    padding: 24px;
+    width: 100%;
+    max-width: 772px;
+    box-shadow: var(--shadow-modal);
+    transition: all var(--transition-slow);
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+.modal-content.is-visible {
+    transform: scale(1);
+    opacity: 1;
+}
+
+@media (min-width: 768px) {
+    .modal-content {
+        padding: 32px 49px;
+    }
+}
+
+/* ---- Modal Icon ---- */
+.modal-icon {
+    width: 82px;
+    height: 81px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.modal-icon--danger {
+    background-color: #fef2f2;
+}
+
+.modal-icon--danger i {
+    color: #ef4444;
+    font-size: 40px;
+}
+
+/* ---- Modal Actions ---- */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    margin-top: var(--space-3xl);
+}
+
+/* ---- Custom Checkbox (used in role permissions) ---- */
+.custom-checkbox {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 4px;
+    background-color: #f3f3f5;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.custom-checkbox:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.custom-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* ---- Permission Category Sidebar ---- */
+.perm-cat-btn.active {
+    background-color: var(--color-primary-bg);
+    color: var(--color-primary);
+}
+
+.perm-cat-btn.active span {
+    color: var(--color-primary);
+}

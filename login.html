@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Maritime Meteorological System</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="assets/js/tailwind.config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Project CSS: Global -->
+    <link rel="stylesheet" href="assets/css/global/variables.css">
+    <link rel="stylesheet" href="assets/css/global/reset.css">
+    <link rel="stylesheet" href="assets/css/global/utilities.css">
+    
+    <!-- Project CSS: Page -->
+    <link rel="stylesheet" href="assets/css/pages/login.css">
+</head>
+<body class=" min-h-screen flex items-center justify-center font-['Inter',sans-serif]">
+    <!-- Main Container -->
+    <div class="relative w-full max-w-full h-screen md:h-[100vh] bg-white flex flex-col md:flex-row overflow-hidden">
+        
+        <!-- Left Section: Branding Image (Rounded & Offset) -->
+        <div class="hidden md:block relative w-[803px] h-[calc(95%)] mt-4 mx-[18px] rounded-[24px] overflow-hidden bg-[#182168] shrink-0">
+            <!-- Main Background Vector -->
+            <img src="assets/img/login-bg.png" alt="Background" class="absolute inset-0 w-full h-full object-cover">
+            
+            <!-- Decorative SVGs (Capa 1 & 2) -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <img src="assets/img/capa1.svg" alt="" class="absolute top-[-15%] left-[-10%] w-[110%] opacity-30 rotate-[-8.54deg]">
+                <img src="assets/img/capa2.svg" alt="" class="absolute bottom-[-15%] right-[-15%] w-[110%] opacity-30 rotate-[11.84deg] scale-x-[-1]">
+            </div>
+            
+            <!-- Branding Content -->
+            <div class="absolute bottom-[60px] left-[46px] z-10 space-y-8">
+                <img src="assets/img/logo-bmkg-white.png" alt="BMKG Logo" class="w-[81px] h-[103px] object-contain">
+                <h1 class="text-white text-[48px] font-bold leading-[1.2] tracking-[-0.44px] uppercase">
+                    MARITIME<br>METEOROLOGICAL SYSTEM
+                </h1>
+            </div>
+        </div>
+
+        <!-- Right Section: Login Form -->
+        <div class="flex-1 flex flex-col items-center justify-center py-12 px-6 sm:px-12">
+            <!-- Form Container -->
+            <div class="w-full max-w-[392px] space-y-[32px]">
+                <!-- Header -->
+                <div class="text-center space-y-[12px]">
+                    <h2 class="text-[#182168] text-[36px] font-bold tracking-[-0.45px] leading-tight">Login</h2>
+                    <p class="text-[#6F6F6F] text-[15px] font-medium tracking-[-0.45px]">
+                        Welcome back, please log in to your account.
+                    </p>
+                </div>
+
+                <!-- Form Fields -->
+                <form action="index.html" class="space-y-[15px]">
+                    <div class="space-y-[15px]">
+                        <!-- Username -->
+                        <div class="relative">
+                            <input type="text" id="username" name="username" 
+                                class="w-full h-[40px] px-[16px] rounded-[16px] border border-[#6F6F6F] focus:border-[#182168] focus:ring-1 focus:ring-[#182168] outline-none transition-all placeholder:text-[#0F0F0F] placeholder:opacity-60 text-[12px] font-medium tracking-[0.48px]"
+                                placeholder="Username" required>
+                        </div>
+                        
+                        <!-- Password -->
+                        <div class="relative">
+                            <input type="password" id="password" name="password" 
+                                class="w-full h-[40px] px-[16px] rounded-[16px] border border-[#6F6F6F] focus:border-[#182168] focus:ring-1 focus:ring-[#182168] outline-none transition-all placeholder:text-[#0F0F0F] placeholder:opacity-60 text-[12px] font-medium tracking-[0.48px]"
+                                placeholder="Password" required>
+                            <button type="button" id="togglePassword" class="absolute right-[16px] top-1/2 -translate-y-1/2 text-[#6F6F6F] hover:text-[#182168]">
+                                <i class="fa-solid fa-eye-slash text-[14px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Login Button -->
+                    <div class="pt-[17px]">
+                        <button type="submit" 
+                            class="w-full h-[51px] bg-[#182168] hover:bg-[#1e2a8a] text-white rounded-[10px] text-[12px] font-semibold tracking-[3.6px] uppercase transition-all active:scale-[0.98]">
+                            LOGIN
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Footer Link -->
+                <div class="text-center pt-[2px]">
+                    <p class="text-[13px] text-[#6F6F6F] tracking-[-0.45px]">
+                        Forgot Password? 
+                        <a href="#" class="text-[#8FC241] font-bold underline ml-1 hover:text-[#7fb135] transition-colors decoration-solid">Click here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Mobile Branding (Only visible on small screens) -->
+    <div class="md:hidden fixed top-6 left-6 z-20">
+        <img src="assets/img/logo-bmkg-white.png" alt="BMKG Logo" class="w-10 h-12 object-contain brightness-0 invert">
+    </div>
+
+    <!-- Project JS: Page -->
+    <script src="assets/js/pages/login.js"></script>
+</body>
+</html>

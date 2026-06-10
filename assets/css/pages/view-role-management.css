@@ -1,0 +1,337 @@
+/* ============================================================
+   PAGE: View Role Management — mobile & tablet
+   ============================================================ */
+
+/* ---- Main tabs (Users / Permissions) ---- */
+.view-role-tabs {
+    display: flex;
+    gap: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.view-role-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.view-role-tabs button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* ---- Permissions panel ---- */
+.view-role-permissions-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .view-role-permissions-card {
+        flex-direction: row;
+        min-height: 520px;
+    }
+}
+
+/* Category navigation — horizontal on mobile/tablet, sidebar on desktop */
+.perm-category-nav {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    padding: 0 12px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+}
+
+.perm-category-nav::-webkit-scrollbar {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .perm-category-nav {
+        flex-direction: column;
+        width: 297px;
+        flex-shrink: 0;
+        padding: 0;
+        max-height: 600px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scroll-snap-type: none;
+        border-bottom: none;
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
+        background: #fff;
+    }
+}
+
+.perm-cat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #a1a1aa;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    scroll-snap-align: start;
+    white-space: nowrap;
+}
+
+.perm-cat-btn:hover {
+    color: #1a4999;
+}
+
+.perm-cat-btn.active {
+    color: #1a4999;
+    border-bottom-color: #71717a;
+    font-weight: 500;
+}
+
+@media (min-width: 768px) {
+    .perm-cat-btn {
+        width: 100%;
+        padding: 16px 36px;
+        font-size: 16px;
+        border-bottom: none;
+        border-left: 3px solid transparent;
+        justify-content: flex-start;
+    }
+
+    .perm-cat-btn.active {
+        background: #dae8ff;
+        border-bottom-color: transparent;
+        border-left-color: #1a4999;
+    }
+}
+
+/* Content area */
+.perm-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+}
+
+@media (min-width: 768px) {
+    .perm-content {
+        padding: 24px;
+        gap: 18px;
+    }
+}
+
+.perm-content-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 12px;
+}
+
+.perm-content-header h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: #151e5a;
+}
+
+@media (min-width: 768px) {
+    .perm-content-header h3 {
+        font-size: 18px;
+    }
+}
+
+/* Scrollable table region */
+.perm-table-scroll-wrap {
+    position: relative;
+    min-width: 0;
+}
+
+.perm-scroll-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #71717a;
+}
+
+.perm-scroll-hint.is-dismissed {
+    display: none;
+}
+
+.perm-scroll-hint i {
+    font-size: 10px;
+    color: #1a4999;
+    animation: perm-hint-nudge 1.4s ease-in-out infinite;
+}
+
+@keyframes perm-hint-nudge {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+}
+
+@media (min-width: 1024px) {
+    .perm-scroll-hint {
+        display: none;
+    }
+}
+
+.perm-table-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #c4c4c4 transparent;
+}
+
+.perm-table-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.perm-table-scroll::-webkit-scrollbar-track {
+    background: #f4f4f5;
+    border-radius: 0 0 10px 10px;
+}
+
+.perm-table-scroll::-webkit-scrollbar-thumb {
+    background: #a1a1aa;
+    border-radius: 10px;
+}
+
+/* Fade edges when more content is available (tablet/mobile) */
+@media (max-width: 1023px) {
+    .perm-table-scroll-wrap::after {
+        content: "";
+        position: absolute;
+        top: 28px;
+        right: 0;
+        bottom: 6px;
+        width: 28px;
+        pointer-events: none;
+        border-radius: 0 10px 10px 0;
+        background: linear-gradient(to left, rgba(255, 255, 255, 0.95), transparent);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .perm-table-scroll-wrap.can-scroll-right::after {
+        opacity: 1;
+    }
+}
+
+.perm-table {
+    width: 100%;
+    min-width: 480px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+@media (min-width: 1024px) {
+    .perm-table {
+        min-width: 0;
+    }
+}
+
+.perm-table thead tr {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.perm-table th {
+    padding: 11px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5565;
+    white-space: nowrap;
+}
+
+.perm-table th.perm-col-action {
+    width: 72px;
+    min-width: 72px;
+    text-align: center;
+}
+
+.perm-table th.perm-col-name {
+    min-width: 140px;
+}
+
+@media (min-width: 768px) {
+    .perm-table th {
+        padding: 13px 17px;
+        font-size: 14px;
+    }
+
+    .perm-table th.perm-col-action {
+        width: 100px;
+        min-width: 100px;
+    }
+}
+
+/* Sticky permission name while scrolling horizontally */
+
+
+.perm-table td {
+    padding: 12px;
+    font-size: 13px;
+    color: #101828;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+@media (min-width: 768px) {
+    .perm-table td {
+        padding: 14px 17px;
+        font-size: 14px;
+    }
+}
+
+.perm-table td.perm-col-action {
+    text-align: center;
+}
+
+.perm-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.perm-table tbody tr.bg-alt {
+    background: rgba(249, 250, 251, 0.8);
+}
+
+/* ---- Users table (mobile/tablet) ---- */
+.view-role-users-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+.view-role-users-table {
+    min-width: 560px;
+}
+
+@media (min-width: 768px) {
+    .view-role-users-table {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .view-role-users-table th,
+    .view-role-users-table td {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+}

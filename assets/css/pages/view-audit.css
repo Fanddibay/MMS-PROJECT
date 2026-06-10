@@ -1,0 +1,379 @@
+/* ============================================================
+   PAGE-SPECIFIC STYLES: view-audit.html (User Activity Log)
+   ============================================================ */
+
+/* Core Layout Adjustments */
+.timeline-section {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Month and Date Headers */
+.month-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    padding: 12px 0;
+    transition: color 0.2s ease;
+}
+
+.month-header:hover {
+    color: #1a4999;
+}
+
+.month-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #18181b;
+}
+
+.date-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    padding: 8px 0;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
+
+.date-header:hover {
+    color: #1a4999;
+}
+
+.date-title-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.date-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #2563eb;
+    border-radius: 50%;
+}
+
+.date-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #27272a;
+}
+
+/* Accordion Transition & Rotations */
+.chevron-icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #71717a;
+    font-size: 14px;
+}
+
+.collapsed .chevron-icon {
+    transform: rotate(-180deg);
+}
+
+.collapsed-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.expanded-content {
+    max-height: 5000px;
+    overflow: visible;
+    opacity: 1;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+/* Timeline Layout */
+.timeline-list {
+    position: relative;
+    padding-left: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.timeline-item {
+    display: flex;
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 8px;
+}
+
+/* Left Column: Timestamp */
+.timeline-time {
+    width: 95px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 500;
+    color: #71717a;
+    padding-top: 13px;
+    flex-shrink: 0;
+}
+
+/* Middle Column: Connector */
+.timeline-connector {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Vertical Connecting Line */
+.timeline-line {
+    position: absolute;
+    width: 2px;
+    background-color: #e2e8f0;
+    top: 50px; /* Start below the icon */
+    bottom: -24px; /* Extend into the next item's space */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+/* Hide the connecting line for the last item in the list */
+.timeline-item:last-child .timeline-line {
+    display: none;
+}
+
+/* Icon Container */
+.timeline-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    z-index: 2;
+    margin-top: 5px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.timeline-item:hover .timeline-icon-box {
+    transform: scale(1.08);
+}
+
+/* Icon Variants */
+.timeline-icon-blue {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+}
+
+.timeline-icon-green {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #15803d;
+}
+
+.timeline-icon-red {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+/* Right Column: Content Card */
+.timeline-card {
+    flex: 1;
+    background-color: #ffffff;
+    border: 1.3px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.timeline-item:hover .timeline-card {
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.04);
+    border-color: #d1d5db;
+}
+
+/* Card Header */
+.timeline-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.timeline-card-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.timeline-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #18181b;
+}
+
+.timeline-card-subtitle {
+    font-size: 13px;
+    font-weight: 500;
+    color: #71717a;
+}
+
+/* Card Details (Grid) */
+.timeline-card-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-label {
+    font-size: 13px;
+    color: #71717a;
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #18181b;
+}
+
+/* Card Additional Section (e.g. Justification, Data layers) */
+.timeline-card-additional {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.additional-label {
+    font-size: 13px;
+    color: #71717a;
+    font-weight: 500;
+}
+
+.additional-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #27272a;
+    line-height: 1.5;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge-active {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-badge-inactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.status-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-badge-active .status-badge-dot {
+    background-color: #166534;
+}
+
+.status-badge-inactive .status-badge-dot {
+    background-color: #991b1b;
+}
+
+/* Empty State Styling */
+.timeline-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1.3px dashed #cbd5e1;
+    border-radius: 21px;
+}
+
+.timeline-empty-icon {
+    font-size: 40px;
+    color: #94a3b8;
+    margin-bottom: 16px;
+}
+
+.timeline-empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 4px;
+}
+
+.timeline-empty-desc {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .timeline-item {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .timeline-time {
+        width: 100%;
+        text-align: left;
+        padding-top: 0;
+        margin-bottom: -4px;
+    }
+    
+    .timeline-connector {
+        width: auto;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+    }
+    
+    .timeline-line {
+        display: none !important; /* Hide connector lines on mobile */
+    }
+    
+    .timeline-icon-box {
+        margin-top: 0;
+    }
+    
+    .timeline-card {
+        margin-left: 0;
+        width: 100%;
+    }
+}

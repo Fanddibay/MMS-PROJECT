@@ -5,17 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Maritime Dashboard Mockup</title>
 
-  <script>
-    (function () {
-      const savedTheme = localStorage.getItem("theme");
-      const theme = savedTheme || "dark";
-      document.documentElement.classList.toggle("dark", theme === "dark");
-      document.documentElement.dataset.theme = theme;
-    })();
-  </script>
-
-  <script src="assets/js/tailwind.config.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+ 
 
   <link
     rel="stylesheet"
@@ -23,6 +13,8 @@
     referrerpolicy="no-referrer"
   />
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css" id="flatpickr-theme" />
   <link rel="stylesheet" href="assets/css/dashboard.css" />
 </head>
 
@@ -30,105 +22,614 @@
   <section id="map" class="absolute inset-0 z-0"></section>
   <div class="map-vignette pointer-events-none absolute inset-0 z-10"></div>
 
-  <header class="navbar-wrap pointer-events-none absolute left-0 right-0 top-0 z-30 w-full px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3">
-    <div class="pointer-events-auto navbar-inner w-full">
-      <div class="navbar-bar flex flex-wrap items-center gap-2 rounded-2xl px-3 py-2.5 sm:flex-nowrap sm:gap-3 sm:px-4 sm:py-3 md:gap-4 md:px-5 md:py-3">
-        <button id="panelToggle" class="info-pill inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition hover:opacity-90 md:hidden" aria-label="Toggle panel">
-          <i class="fa-solid fa-bars text-sm"></i>
+  <!-- Sidebar Pinned Left (Figma: new sidebar) -->
+  <aside id="leftSidebar" class="absolute left-0 top-0 bottom-0 z-30 w-[62px] bg-[#182168] border-r border-[#0e1629] flex flex-col items-center py-6 justify-between h-screen shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.25)]">
+    <div class="flex flex-col gap-6 items-center w-full">
+      <!-- BMKG Logo -->
+      <a href="dashboard.html" class="h-[46px] w-[36px] flex items-center justify-center shrink-0 mb-4" title="Main Dashboard">
+        <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="w-full h-auto object-contain" />
+      </a>
+      
+      <!-- Circle Icon Stack -->
+      <div class="flex flex-col gap-[18px] items-center w-full">
+        <button id="sidebarHomeBtn" type="button" class="sidebar-rail-btn w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Data Layers" aria-expanded="false" aria-controls="dataLayersPanel">
+          <i class="fa-solid fa-home text-[16px]"></i>
         </button>
-
-        <div class="navbar-location flex min-w-0 shrink-0 items-center gap-2 sm:gap-2.5 md:min-w-[200px]">
-          <span class="info-pill inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl sm:h-9 sm:w-9">
-            <i class="fa-solid fa-location-dot text-xs"></i>
-          </span>
-          <div class="min-w-0">
-            <p class="navbar-title truncate text-lg font-semibold leading-tight tracking-tight sm:text-xl md:text-2xl">Tanjung Priok Port</p>
-            <p class="mt-0.5 truncate text-xs text-slate-300">Jakarta, Indonesia</p>
-          </div>
-        </div>
-
-        <div class="navbar-search order-3 w-full min-w-0 sm:order-none sm:ml-2 sm:w-[200px] md:w-[240px]">
-          <label class="relative block w-full">
-            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400"></i>
-            <input type="search" placeholder="Search location" class="search-input w-full rounded-full border py-2.5 pl-4 pr-10 text-sm outline-none transition sm:py-2.5" />
-          </label>
-        </div>
-
-        <div class="navbar-actions ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
-          <div class="info-pill hidden items-center gap-2 rounded-xl px-3 py-2 text-xs sm:flex sm:rounded-2xl md:gap-2.5 md:px-3.5 md:py-2">
-            <i class="fa-regular fa-clock text-[11px] text-slate-400"></i>
-            <div class="min-w-0">
-              <p class="font-semibold leading-tight">07:06 AM</p>
-              <p class="text-[11px] text-slate-300">Wed, Feb 11</p>
-            </div>
-          </div>
-
-          <div class="info-pill hidden items-center gap-2 rounded-xl px-3 py-2 text-xs sm:flex sm:rounded-2xl md:gap-2.5 md:px-3.5 md:py-2">
-            <i class="fa-solid fa-cloud text-[11px] text-slate-400"></i>
-            <div class="min-w-0">
-              <p class="font-semibold leading-tight">27°C</p>
-              <p class="text-[11px] text-slate-300">Partly Cloudy</p>
-            </div>
-          </div>
-
-          <button id="themeToggle" class="info-pill inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition hover:opacity-90 sm:h-10 sm:w-10" aria-label="Toggle theme">
-            <i class="fa-solid fa-moon text-sm"></i>
-          </button>
-
-          <button class="info-pill inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition hover:opacity-90" aria-label="User">
-            <i class="fa-regular fa-user text-sm"></i>
-          </button>
-        </div>
+        
+        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Weather Model">
+          <i class="fa-solid fa-cloud-sun text-[16px]"></i>
+        </button>
+        
+        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Stations">
+          <i class="fa-solid fa-location-dot text-[16px]"></i>
+        </button>
+        
+        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Create Station">
+          <i class="fa-solid fa-file-circle-plus text-[16px]"></i>
+        </button>
+        
+        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Map Views">
+          <i class="fa-solid fa-map text-[16px]"></i>
+        </button>
+        
+        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Globe Views">
+          <i class="fa-solid fa-globe text-[16px]"></i>
+        </button>
+        
+        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Alerts">
+          <i class="fa-solid fa-triangle-exclamation text-[16px]"></i>
+        </button>
+        
+        <div class="h-[1px] w-[36px] bg-white/20 my-1"></div>
+        
+        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Waves">
+          <i class="fa-solid fa-water text-[16px]"></i>
+        </button>
+        
+        <button id="windBtn" class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Wind">
+          <i class="fa-solid fa-compass text-[16px]"></i>
+        </button>
+        
+        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Vessels">
+          <i class="fa-solid fa-ship text-[16px]"></i>
+        </button>
       </div>
     </div>
-  </header>
-
-  <aside id="leftPanel" class="dashboard-left absolute left-3 top-20 z-30 w-[320px] max-w-[86vw] transition-transform duration-300 md:left-5 md:top-24 md:translate-x-0">
-    <!-- Card 1: Info Model -->
-    <div class="panel-card rounded-2xl p-4">
-      <div class="mb-3 flex justify-between border-b border-white/15 pb-2 text-xs">
-        <span class="font-semibold text-slate-100">Info Model</span>
-        <span class="text-slate-400">Status &amp; Waktu</span>
-      </div>
-      <div class="mb-2 flex justify-between text-[11px]">
-        <span class="text-slate-400">Parameter</span>
-        <span class="max-w-[160px] text-right font-semibold text-slate-100">Tinggi Gelombang Signifikan</span>
-      </div>
-      <div class="mb-2 flex justify-between text-[11px]">
-        <span class="text-slate-400">Model</span>
-        <span class="model-pill rounded-full px-2.5 py-1 text-[11px] font-semibold text-white">Inwaves Hires</span>
-      </div>
-      <div class="flex justify-between text-[11px]">
-        <span class="text-slate-400">Waktu valid</span>
-        <span class="font-semibold text-slate-100">03 Feb 2026, 10:00 WIB</span>
-      </div>
-    </div>
-
-    <!-- Card 2: Penjelasan Parameter (tanpa inner card) -->
-    <div class="panel-card mt-3 rounded-2xl p-4">
-      <p class="border-b border-white/15 pb-2 text-xs font-semibold text-slate-200">Penjelasan Parameter</p>
-      <h3 class="mt-2 text-base font-semibold leading-tight text-slate-100">Tinggi Gelombang Angin</h3>
-      <p class="mt-2 text-xs leading-relaxed text-slate-300">
-        Tinggi gelombang yang disebabkan oleh angin lokal. Gelombang ini biasanya lebih pendek dan lebih curam dibandingkan gelombang utama.
-      </p>
-      <p class="mt-3 border-b border-white/15 pb-2 text-xs font-semibold text-slate-200">Penjelasan Parameter</p>
-      <p class="mt-2 text-xs leading-relaxed text-slate-300">
-        Gelombang angin memberikan informasi tentang kondisi laut lokal. Penting untuk aktivitas maritim dekat pantai, perikanan, dan rekreasi laut.
-      </p>
+    
+    <!-- Bottom Elements: Theme Toggle + User Profile -->
+    <div class="flex flex-col gap-4 items-center w-full">
+      <button id="themeToggle" class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Toggle Theme">
+        <i class="fa-solid fa-moon text-base"></i>
+      </button>
+      <a href="user-management.html" class="w-[36px] h-[36px] rounded-full overflow-hidden border border-white/20 hover:border-white transition-all flex items-center justify-center" title="User Profile">
+        <i class="fa-solid fa-circle-user text-[28px] text-white/95"></i>
+      </a>
     </div>
   </aside>
 
-  <nav class="absolute right-3 top-24 z-30 flex flex-col gap-2 md:right-5" aria-label="Right toolbar">
-    <button class="glass-surface relative inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Notifications">
-      <i class="fa-regular fa-bell"></i>
-      <span class="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">2</span>
+  <!-- Sliding Data Layers Panel (Figma: Data layer - default & open more expand views) -->
+  <div id="dataLayersPanel" class="fixed inset-y-0 left-0 sm:left-[78px] top-0 sm:top-[20px] bottom-0 sm:bottom-[20px] z-40 w-full sm:w-[360px] bg-white text-slate-800 rounded-none sm:rounded-[20px] shadow-[0_10px_25px_rgba(24,33,104,0.15)] flex flex-col transition-all duration-300 transform -translate-x-[400px] opacity-0 pointer-events-none">
+    
+    <!-- Backdrop for mobile/tablet clicks outside -->
+    <div id="dataLayersBackdrop" class="fixed inset-0 bg-slate-900/40 -z-10 block sm:hidden hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Panel Shell (inner scrollable content container) -->
+    <div class="flex flex-col h-full overflow-hidden p-6 relative">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-[#1a4999] text-[18px] tracking-[0.1172px]">Data Layers</h2>
+        <button id="dataLayerCloseBtn" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors" title="Close Panel">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Search Location in Panel -->
+      <div class="relative bg-[#f1f1f1] h-[34px] rounded-[20px] mb-4 flex items-center px-4">
+        <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs mr-2"></i>
+        <input type="text" placeholder="Search..." class="bg-transparent border-none text-[12px] text-slate-800 placeholder-slate-400 focus:outline-none w-full" />
+      </div>
+
+      <!-- Filters Section -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-1.5 text-[11px] text-slate-800">
+          <i class="fa-solid fa-circle-minus text-slate-500 text-xs"></i>
+          <span>Filter by</span>
+        </div>
+        <div class="flex gap-1.5 items-center">
+          <button id="clearAllFiltersBtn" class="border border-[#d7d7d7] px-2.5 py-1 rounded-[15px] text-[11px] text-slate-800 hover:bg-slate-50 transition flex items-center gap-1">
+            <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
+            Clear all
+          </button>
+          <button id="activeFiltersBadge" class="border border-[#d7d7d7] px-2.5 py-1 rounded-[15px] text-[11px] text-slate-800 bg-slate-50 transition">
+            Active (0)
+          </button>
+          <button class="border border-[#d7d7d7] px-2.5 py-1 rounded-[15px] text-[11px] text-slate-800 hover:bg-slate-50 transition">
+            Map View
+          </button>
+        </div>
+      </div>
+
+<!-- Scrollable Categories Stack (Figma: Data layer - open expand) -->
+      <div class="data-layers-scroll flex-1 overflow-y-auto pr-1 space-y-1 no-scrollbar">
+
+        <!-- Models -->
+        <details class="data-group data-group-models" open>
+          <summary>Models</summary>
+          <div class="data-group-card space-y-0">
+            <!-- Inaflows -->
+            <details class="data-group nested" open>
+              <summary>Inaflows</summary>
+              <div class="space-y-1.5 pt-1 pb-3">
+                <!-- data layer 1 -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row is-selected">
+                    <input type="checkbox" checked data-layer-id="salinity">
+                    <span class="data-layer-label">Sea Water Salinity (S)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- data layer 2 -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="eastward-velocity">
+                    <span class="data-layer-label">Eastward Sea Water Velocity (u)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                  <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                    <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- data layer 3 -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="surface-elevation">
+                    <span class="data-layer-label">Sea Surface Elevation (zeta)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                  <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                    <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- data layer 4 -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="temperature">
+                    <span class="data-layer-label">Sea Water Temperature (T)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                  <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                    <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- data layer 5 -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="northward-velocity">
+                    <span class="data-layer-label">Northward Sea Water Velocity (v)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <!-- Inawaves -->
+            <details class="data-group nested">
+              <summary>Inawaves</summary>
+              <div class="space-y-1.5 pt-1 pb-3">
+                <!-- data layer hmax -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="hmax">
+                    <span class="data-layer-label">Maximum Wave Height (hmax)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- data layer dir -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="dir">
+                    <span class="data-layer-label">Mean Wave Direction (dir)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- data layer lm -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="lm">
+                    <span class="data-layer-label">Mean Wavelength (lm)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- data layer t01 -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="t01">
+                    <span class="data-layer-label">Mean Wave Period (t01)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- data layer ptp00 -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="ptp00">
+                    <span class="data-layer-label">Primary Swell Period (ptp00)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- data layer ptp01 -->
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="ptp01">
+                    <span class="data-layer-label">Secondary Swell Period (ptp01)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <!-- GFS -->
+            <details class="data-group nested">
+              <summary>GFS</summary>
+              <div class="space-y-1.5 pt-1 pb-1">
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="data-layer-row">
+                    <input type="checkbox" data-layer-id="gfs-wind">
+                    <span class="data-layer-label">Wind Speed (10m)</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    </button>
+                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
+                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </details>
+
+        <!-- Other layer groups -->
+        <details class="data-group collapsed-group">
+          <summary>Observation Stations</summary>
+          <div class="data-group-card">
+            <p class="text-[10px] text-slate-600 leading-relaxed">Station layers will appear here.</p>
+          </div>
+        </details>
+
+        <details class="data-group collapsed-group">
+          <summary>Satelite</summary>
+          <div class="data-group-card">
+            <p class="text-[10px] text-slate-600 leading-relaxed">Satellite imagery layers will appear here.</p>
+          </div>
+        </details>
+
+        <details class="data-group collapsed-group">
+          <summary>Radar</summary>
+          <div class="data-group-card">
+            <p class="text-[10px] text-slate-600 leading-relaxed">Radar layers will appear here.</p>
+          </div>
+        </details>
+
+        <details class="data-group collapsed-group">
+          <summary>Cyclone Track Forecast</summary>
+          <div class="data-group-card">
+            <p class="text-[10px] text-slate-600 leading-relaxed">Cyclone track layers will appear here.</p>
+          </div>
+        </details>
+
+      </div>
+
+
+    </div>
+  </div>
+
+  <!-- Centered Location Search Bar (Figma: Search Container) -->
+  <div class="absolute left-1/2 -translate-x-1/2 top-[20px] z-30 w-[510px] h-[69px] bg-white rounded-[10px] shadow-[0_10px_25px_rgba(24,33,104,0.15)] px-[18px] py-[14px] flex items-center gap-[10px] border border-[rgba(24,33,104,0.06)] pointer-events-auto">
+    <!-- Port info and label -->
+    <div class="flex items-center gap-[8px] w-[188px] shrink-0">
+      <div class="w-[34px] h-[34px] bg-[#1a4999] border border-white/20 rounded-[14px] flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-location-dot text-white text-[16px]"></i>
+      </div>
+      <div class="flex flex-col min-w-0 leading-tight">
+        <span class="font-bold text-[#182168] text-[16px] truncate tracking-tight">Tanjung Priok Port</span>
+        <span class="text-[12px] text-black/70 truncate">Jakarta, Indonesia</span>
+      </div>
+    </div>
+    <!-- Search field -->
+    <div class="bg-[#f1f1f1] rounded-[20px] h-[41px] w-[274px] px-[19px] flex items-center justify-between ml-auto">
+      <input type="text" placeholder="Search location" class="bg-transparent border-none outline-none text-[#182168] font-medium text-[14px] w-[200px] placeholder-[#182168]/70" />
+      <i class="fa-solid fa-magnifying-glass text-[#182168] text-sm shrink-0"></i>
+    </div>
+  </div>
+
+  <!-- Top Right widgets (Figma: Button Stack) -->
+  <div class="absolute right-[20px] top-[20px] z-30 flex flex-col gap-[12px] items-start pointer-events-auto">
+    <!-- Clock Button -->
+    <button class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg" title="System Time">
+      <i class="fa-regular fa-clock text-lg"></i>
     </button>
-    <button class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Layers"><i class="fa-solid fa-layer-group"></i></button>
-    <button id="crosshairBtn" class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Crosshair" aria-expanded="false"><i class="fa-solid fa-crosshairs"></i></button>
-    <button id="zoomInBtn" class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Zoom in"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-    <button id="zoomOutBtn" class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Zoom out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-    <button class="glass-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl border transition hover:bg-white/20" aria-label="Toolbar settings"><i class="fa-solid fa-sliders"></i></button>
-  </nav>
+    <!-- Weather Panel trigger -->
+    <button class="w-[50px] h-[50px] bg-[#182168] border border-white/20 rounded-[14px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg" title="Weather Info">
+      <i class="fa-solid fa-cloud text-lg"></i>
+    </button>
+  </div>
+
+  <!-- Right Floating Utilities Widget stack (Figma: QuickAccessWidgets) -->
+  <div class="absolute right-[20px] top-[200px] z-30 flex flex-col gap-[12px] items-start pointer-events-auto">
+    <!-- Notifications bell -->
+    <div class="relative">
+      <button id="notificationBtn" class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white relative flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg" title="Notifications">
+        <i class="fa-regular fa-bell text-lg"></i>
+        <span id="notifBadge" class="absolute -right-1 -top-1 w-[20px] h-[20px] bg-[#fb2c36] border-2 border-white rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm">2</span>
+      </button>
+
+      <!-- Notification Dropdown Panel (Figma: node 3894-2239) -->
+      <div id="notificationDropdown" class="absolute right-[80px] top-0 w-[340px]  bg-white rounded-[20px] shadow-[0_16px_48px_rgba(24,33,104,0.18)] border border-[rgba(24,33,104,0.08)] overflow-hidden z-[999999999999] opacity-0 scale-95 translate-y-[-8px] pointer-events-none transition-all duration-200 origin-top-right">
+        <!-- Dropdown Header -->
+        <div class="flex items-center justify-between px-5 pt-5 pb-3">
+          <div class="flex items-center gap-2">
+            <h3 class="text-[#182168] font-bold text-[15px] tracking-tight">Notifications</h3>
+            <span class="inline-flex items-center justify-center bg-[#fb2c36] text-white text-[9px] font-bold rounded-full w-[18px] h-[18px]">2</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="markAllReadBtn" class="text-[11px] text-[#1a4999] font-semibold hover:text-[#182168] transition-colors" title="Mark all as read">Mark all read</button>
+            <button id="notifCloseBtn" class="w-7 h-7 rounded-[8px] bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition flex items-center justify-center" title="Close">
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab strip -->
+        <div class="flex items-center gap-1 px-5 pb-3">
+          <button class="notif-tab is-active text-[11px] font-semibold px-3 py-1 rounded-[20px] transition-all" data-tab="all">All</button>
+          <button class="notif-tab text-[11px] font-semibold px-3 py-1 rounded-[20px] transition-all" data-tab="unread">Unread (2)</button>
+          <button class="notif-tab text-[11px] font-semibold px-3 py-1 rounded-[20px] transition-all" data-tab="alerts">Alerts</button>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="flex flex-col divide-y divide-slate-100 max-h-[320px] overflow-y-auto no-scrollbar">
+
+          <!-- Notification Item 1 – Unread -->
+          <div class="notif-item flex items-start gap-3 px-5 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-unread="true">
+            <div class="w-[24px] h-[24px] rounded-[12px] bg-[#fff3f3] flex items-center justify-center shrink-0 mt-0.5">
+              <div class="w-2 h-2 rounded-full bg-[#fb2c36]"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <p class="text-[12px] font-semibold text-[#182168] leading-snug">High Wave Alert – Selat Sunda</p>
+                <span class="w-2 h-2 rounded-full bg-[#fb2c36] shrink-0 mt-1.5"></span>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Wave height exceeded 3.2m at Selat Sunda monitoring station.</p>
+              <span class="text-[10px] text-slate-400 mt-1 block">2 minutes ago</span>
+            </div>
+          </div>
+
+          <!-- Notification Item 2 – Unread -->
+          <div class="notif-item flex items-start gap-3 px-5 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-unread="true">
+           
+             <div class="w-[24px] h-[24px] rounded-[12px] bg-[#fffaf3] flex items-center justify-center shrink-0 mt-0.5">
+              <div class="w-2 h-2 rounded-full bg-[#f97316]"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <p class="text-[12px] font-semibold text-[#182168] leading-snug">Wind Speed Update – Laut Jawa</p>
+                <span class="w-2 h-2 rounded-full bg-[#fb2c36] shrink-0 mt-1.5"></span>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Wind speed 45 knots recorded, approaching storm threshold.</p>
+              <span class="text-[10px] text-slate-400 mt-1 block">18 minutes ago</span>
+            </div>
+          </div>
+
+          <!-- Notification Item 3 – Read -->
+          <div class="notif-item flex items-start gap-3 px-5 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-unread="false">
+            
+            <div class="w-[24px] h-[24px] rounded-[12px] bg-[#f3f3ff] flex items-center justify-center shrink-0 mt-0.5">
+              <div class="w-2 h-2 rounded-full bg-[#1a4999]"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[12px] font-semibold text-slate-700 leading-snug">Radar Data Refreshed – Surabaya</p>
+              <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">Local radar imagery updated successfully for Surabaya region.</p>
+              <span class="text-[10px] text-slate-400 mt-1 block">1 hour ago</span>
+            </div>
+          </div>
+
+          <!-- Notification Item 4 – Read -->
+          <div class="notif-item flex items-start gap-3 px-5 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-unread="false">
+            
+            <div class="w-[24px] h-[24px] rounded-[12px] bg-[#f5fff3] flex items-center justify-center shrink-0 mt-0.5">
+              <div class="w-2 h-2 rounded-full bg-[#22c55e]"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[12px] font-semibold text-slate-700 leading-snug">Model Run Completed – INAFLOWS</p>
+              <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">INAFLOWS 72-hour forecast model run completed without errors.</p>
+              <span class="text-[10px] text-slate-400 mt-1 block">3 hours ago</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="px-5 py-4 border-t border-slate-100 bg-slate-50/60">
+          <button id="seeAllNotifBtn" class="w-full h-[38px] bg-[#182168] hover:bg-[#182168]/90 text-white rounded-[12px] text-[12px] font-semibold transition-all shadow-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-list text-[10px]"></i>
+            See All Notifications
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Direction / Compass (Virtual Station) -->
+    <div class="relative">
+      <button id="compassBtn" class="w-[50px] h-[50px] bg-[#182168] border border-white/20 rounded-[14px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg" title="Virtual Station">
+        <i class="fa-solid fa-compass text-lg"></i>
+      </button>
+
+      <!-- Virtual Station Popup (Figma: node 4538-886) -->
+      <div id="compassDropdown"
+           class="fixed right-[80px] top-[262px] w-[231px] bg-[#182168] rounded-[16px] shadow-[0_16px_48px_rgba(24,33,104,0.35)] z-[9999] opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-right overflow-hidden"
+           role="dialog" aria-label="Virtual Station">
+
+        <!-- Card Body -->
+        <div class="px-[18px] pt-[16px] pb-[18px] space-y-[10px]">
+
+          <!-- Title + Close row -->
+          <div class="flex items-center justify-between mb-[2px]">
+            <h3 class="text-white font-bold text-[14px] leading-tight tracking-tight">Virtual Station</h3>
+            <button id="compassCloseBtn" class="w-6 h-6 rounded-[6px] bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shrink-0" title="Close">
+              <i class="fa-solid fa-xmark text-[11px]"></i>
+            </button>
+          </div>
+
+          <!-- Longitude field -->
+          <div>
+            <label for="compassLonInput" class="text-white/70 text-[11px] font-medium mb-[5px] block">Longitude</label>
+            <div id="compassLonWrap" class="vs-input-wrap">
+              <input id="compassLonInput" type="number" step="any" min="-180" max="180"
+                     placeholder="-180 to 180"
+                     class="vs-input" />
+              <div class="vs-spinner" aria-hidden="true">
+                <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLonInput" data-dir="up"><i class="fa-solid fa-chevron-up text-[8px]"></i></button>
+                <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLonInput" data-dir="down"><i class="fa-solid fa-chevron-down text-[8px]"></i></button>
+              </div>
+            </div>
+            <p id="compassLonError" class="text-[10px] text-red-300 mt-1 hidden">Must be between -180 and 180.</p>
+          </div>
+
+          <!-- Latitude field -->
+          <div>
+            <label for="compassLatInput" class="text-white/70 text-[11px] font-medium mb-[5px] block">Latitude</label>
+            <div id="compassLatWrap" class="vs-input-wrap">
+              <input id="compassLatInput" type="number" step="any" min="-90" max="90"
+                     placeholder="-90 to 90"
+                     class="vs-input" />
+              <div class="vs-spinner" aria-hidden="true">
+                <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLatInput" data-dir="up"><i class="fa-solid fa-chevron-up text-[8px]"></i></button>
+                <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLatInput" data-dir="down"><i class="fa-solid fa-chevron-down text-[8px]"></i></button>
+              </div>
+            </div>
+            <p id="compassLatError" class="text-[10px] text-red-300 mt-1 hidden">Must be between -90 and 90.</p>
+          </div>
+
+          <!-- Go button -->
+          <button id="compassGoBtn"
+                  class="w-full h-[38px] bg-[#3a7fdb] hover:bg-[#2d6cc9] text-white rounded-[10px] text-[13px] font-semibold transition-all flex items-center justify-center mt-[2px]">
+            Go
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Crosshair trigger -->
+    <button class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg cursor-pointer" title="Catalogue Overlay">
+      <i class="fa-solid fa-crosshairs text-lg"></i>
+    </button>
+
+    <!-- Zoom out -->
+    <button id="zoomOutBtn" class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg cursor-pointer" title="Zoom Out">
+      <i class="fa-solid fa-magnifying-glass-minus text-lg"></i>
+    </button>
+
+    <!-- Zoom in -->
+    <button id="zoomInBtn" class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg cursor-pointer" title="Zoom In">
+      <i class="fa-solid fa-magnifying-glass-plus text-lg"></i>
+    </button>
+
+    <!-- Server Layers Panel -->
+    <button id="layersPanelBtn" class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg cursor-pointer" title="Data Layers">
+      <i class="fa-solid fa-layer-group text-lg"></i>
+    </button>
+  </div>
 
   <!-- Figma: Filters + Catalogue overlay (opened by Crosshair button) -->
   <section id="catalogOverlay" class="catalog-overlay fixed inset-0 z-40 hidden" aria-hidden="true">
@@ -256,97 +757,421 @@
     </div>
   </section>
 
- 
 
-  <footer class="footer-bottom absolute inset-x-0 bottom-0 z-30 flex flex-col items-center pb-3 pt-0 sm:pb-4">
-    <div
-      class="glass-surface pointer-events-none mb-4 ms-auto  justify-end  w-[280px] rounded-2xl border p-3 md:block">
-      <p class="text-xs font-semibold">Penjelasan Parameter</p>
-      <p class="mt-1 text-xs text-slate-300">Knot</p>
-      <div class="knot-gradient mt-2 h-2 w-full rounded-full"></div>
-      <div class="mt-1 flex justify-between text-[10px] text-slate-300">
-        <span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span><span>35</span><span>40</span><span>45</span><span>50</span><span>55</span><span>60</span><span>65</span><span>70</span>
+  <!-- Bottom Panel (Figma: Playback & Wave Chart) -->
+  <div id="mapBottomPanel" class="map-bottom-panel absolute left-[84px] z-0 bottom-[20px] right-[20px] max-w-[93%] flex flex-col gap-[9px] pointer-events-auto">
+    <!-- Playback Timeline toolbar -->
+    <div class="flex gap-[9px] items-center w-full">
+      <!-- Play/Pause Button -->
+      <button class="w-[44px] h-[30px] rounded-[8px] bg-[#182168] border border-[#182168] text-white flex items-center justify-center shrink-0 cursor-pointer hover:bg-[#182168]/95 transition-all shadow-md" title="Play/Pause Simulation">
+        <i class="fa-solid fa-play text-xs"></i>
+      </button>
+      
+      <!-- Timeline chips row -->
+      <div id="footerInner" class="footer-inner flex-1 h-[30px] bg-white border border-[rgba(255,255,255,0.6)] rounded-[8px] flex items-center overflow-hidden relative shadow-md">
+        <!-- Active tag -->
+        <div class="bg-[#182168] h-full px-4 flex items-center justify-center shrink-0 rounded-l-[8px] text-white text-[10px] font-semibold tracking-tight">Rabu 4</div>
+        <!-- Scrollable segments -->
+        <div id="bottomBar" class="flex-1 flex items-center h-full text-[#555] text-[10px] font-semibold divide-x divide-gray-100/80 overflow-x-auto no-scrollbar">
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors bg-blue-50/40 text-[#182168]">00:00</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors bg-blue-50/40 text-[#182168]">00:30</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">01:00</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">01:30</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">02:00</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">02:30</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">03:00</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">03:30</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">04:00</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">04:30</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">05:00</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">05:30</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">06:00</div>
+          <div class="flex-1 min-w-[70px] h-full flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors">06:30</div>
+        </div>
+        <button id="bottomToggle" type="button" class="bottom-panel-toggle shrink-0" aria-expanded="true" aria-label="Toggle wave chart" title="Toggle wave chart">
+          <i id="bottomToggleIcon" class="fa-solid fa-chevron-down text-[10px] text-[#182168]"></i>
+        </button>
       </div>
     </div>
-    <div id="footerInner" class="footer-inner w-full max-w-[1200px] ">
-      <div class="panel-card relative rounded-2xl border">
-        <button id="bottomToggle" class="mid-chevron absolute left-1/2 top-0 z-[9999999999999999999] inline-flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border" type="button" aria-label="Toggle bottom bar" aria-expanded="true">
-          <i id="bottomToggleIcon" class="fa-solid fa-chevron-down text-[10px] transition-transform duration-300"></i>
-        </button>
 
-        <div id="bottomBar" class="bottom-collapsible">
-          <div class="status-strip flex flex-wrap items-center justify-between gap-2 rounded-t-2xl border-b px-4 py-2.5 sm:px-5">
-            <div class="flex items-center gap-2">
-              <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                <i class="fa-solid fa-anchor text-sm text-white"></i>
-              </span>
-              <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/25">
-                <i class="fa-solid fa-circle-check text-emerald-200"></i>
-              </span>
-              <div>
-                <p class="text-[11px] uppercase tracking-[0.18em]">Maritime Status</p>
-                <p class="text-base font-semibold">Safe to Sail</p>
+    <!-- Wave Chart Card (Figma: numberCard) -->
+    <div id="bottomChartPanel" class="bottom-collapsible w-full h-[160px] bg-white rounded-[16px] shadow-lg border border-[rgba(0,0,0,0.06)] p-3 relative flex flex-col justify-between overflow-hidden">
+      <!-- Y-Axis labels (Absolute on the left) -->
+      <div class="absolute left-[16px] top-[14px] bottom-[26px] flex flex-col justify-between text-[10px] font-medium text-black/60 shrink-0 pointer-events-none">
+        <span>3m</span>
+        <span>2m</span>
+        <span>1m</span>
+        <span>0m</span>
+      </div>
+
+      <!-- Action buttons inside chart (Absolute on top right) -->
+      <div class="absolute right-[16px] top-[12px] flex gap-[4px] z-10">
+        <button class="border border-[#d7d7d7] rounded-[5px] text-[8px] font-semibold text-black/80 px-2 py-1 bg-transparent hover:bg-gray-50 transition-all shadow-sm">Show in Dashboard</button>
+        <button class="border border-[#d7d7d7] rounded-[5px] text-[8px] font-semibold text-black/80 px-2 py-1 bg-transparent hover:bg-gray-50 transition-all shadow-sm">Add to Virtual Stations</button>
+      </div>
+
+      <!-- Center responsive SVG wave chart -->
+      <div class="flex-1 w-full pl-[28px] pr-2 pt-[10px] flex items-center relative overflow-visible">
+        <svg viewBox="0 0 1200 80" class="w-full h-[65px] overflow-visible">
+          <defs>
+            <linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#182168" stop-opacity="0.28" />
+              <stop offset="100%" stop-color="#182168" stop-opacity="0.0" />
+            </linearGradient>
+          </defs>
+          <!-- Grid Background lines -->
+          <line x1="0" y1="5" x2="1200" y2="5" stroke="#efefef" stroke-width="1" />
+          <line x1="0" y1="28" x2="1200" y2="28" stroke="#efefef" stroke-width="1" />
+          <line x1="0" y1="51" x2="1200" y2="51" stroke="#efefef" stroke-width="1" />
+          <line x1="0" y1="74" x2="1200" y2="74" stroke="#efefef" stroke-width="1" />
+          
+          <!-- The wave shadow/gradient path -->
+          <path d="M 0,55 C 80,48 160,20 240,30 C 320,40 400,60 480,56 C 560,52 640,22 720,20 C 800,18 880,40 960,42 C 1040,44 1120,30 1200,32 L 1200,80 L 0,80 Z" fill="url(#waveGradient)" />
+          <!-- The main wave line path -->
+          <path d="M 0,55 C 80,48 160,20 240,30 C 320,40 400,60 480,56 C 560,52 640,22 720,20 C 800,18 880,40 960,42 C 1040,44 1120,30 1200,32" fill="none" stroke="#182168" stroke-width="2.5" />
+          
+          <!-- Dotted vertical line for MAX at index 20.00 (which is exactly at x=720) -->
+          <line x1="720" y1="0" x2="720" y2="80" stroke="#ff6700" stroke-width="1.5" stroke-dasharray="3,3" />
+          <!-- Orange dot indicator for MAX -->
+          <circle cx="720" cy="20" r="4.5" fill="#ff6700" stroke="white" stroke-width="1.5" />
+        </svg>
+
+        <!-- Dynamic positioning of MAX indicator tag -->
+        <div class="absolute left-[calc(720*100%/1200 + 16px)] top-[2px] -translate-x-1/2 flex flex-col items-center select-none pointer-events-none">
+          <div class="bg-[rgba(255,255,255,0.95)] px-[8px] py-[2px] rounded-[4px] border border-orange-500 shadow-sm text-[#ff6700] text-[8px] font-bold">MAX</div>
+          <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[3px] border-t-orange-500"></div>
+        </div>
+      </div>
+
+      <!-- X-Axis timeline labels row -->
+      <div class="flex justify-between items-center text-[9px] font-medium text-black/90 pl-[28px] pr-2 pt-0.5 border-t border-gray-100 select-none">
+        <span>09.00</span><span>10.00</span><span>11.00</span><span>12.00</span><span>13.00</span>
+        <span>14.00</span><span>15.00</span><span>16.00</span><span>17.00</span><span>18.00</span>
+        <span>19.00</span><span>20.00</span><span>21.00</span><span>22.00</span><span>23.00</span>
+        <span>00.00</span><span>01.00</span><span>02.00</span><span>03.00</span><span>04.00</span>
+        <span>05.00</span><span>06.00</span><span>07.00</span><span>08.00</span><span>09.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Centered Modal: Add Layer to Map -->
+  <section id="addLayerModalWrapper" class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+    <!-- Blur Backdrop -->
+    <div id="addLayerModalBackdrop" class="absolute inset-0 bg-[#1a1a1a]/70 backdrop-blur-sm pointer-events-auto"></div>
+
+    <!-- Modal Card Shell -->
+    <div id="addLayerModalCard" class="relative bg-white w-[min(772px,92vw)] max-h-[85vh] rounded-[16px] shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-all duration-300 z-10 border border-white/60 pointer-events-auto">
+      <!-- Modal Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between p-6 pb-4 gap-4 border-b border-gray-100 shrink-0">
+        <div class="flex items-center justify-between">
+          <h2 class="text-[16px] font-bold text-[#182168] tracking-tight">Add Layer to Map</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Search field -->
+          <div class="bg-[#f1f1f1] rounded-[12px] h-[35px] px-3 flex items-center w-full sm:w-[240px] border border-transparent focus-within:border-[#1a4999]/30 transition-all">
+            <input id="addLayerSearchInput" type="text" placeholder="Data Type or ID" class="bg-transparent border-none outline-none text-[#303a48] text-[11px] w-full placeholder-slate-400 font-medium" />
+            <i class="fa-solid fa-magnifying-glass text-slate-500 text-[10px]"></i>
+          </div>
+          <!-- Close button -->
+          <button id="addLayerCloseBtn" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-slate-500 hover:text-slate-700 transition flex items-center justify-center shrink-0 cursor-pointer" title="Close">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Grid of Cards) -->
+      <div class="flex-1 overflow-y-auto p-6 custom-scrollbar bg-slate-50/30">
+        <div id="addLayerCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 min-h-[150px]">
+          <!-- Cards populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Modal Footer (Pagination) -->
+      <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 shrink-0 select-none">
+        <div id="addLayerPaginationInfo" class="text-[11px] text-slate-500 font-medium">Showing 1-8 of 15 layers</div>
+        <div class="flex gap-2">
+          <button id="addLayerPrevBtn" class="border border-[#d4d4d8] text-[#27272a] rounded-[10px] w-[100px] h-[34px] flex items-center justify-center text-[12px] font-medium hover:bg-gray-100 active:bg-gray-200 transition-all cursor-pointer disabled:opacity-40 disabled:pointer-events-none">
+            Previous
+          </button>
+          <button id="addLayerNextBtn" class="bg-[#1a4999] hover:bg-[#182168] text-white rounded-[10px] w-[100px] h-[34px] flex items-center justify-center text-[12px] font-semibold transition-all cursor-pointer disabled:opacity-40 disabled:pointer-events-none">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Panel  -->
+    <div id="layerDetailPanel" class="absolute z-20 bg-white w-[min(455px,92vw)] max-h-[85vh] rounded-[26px] shadow-2xl flex flex-col overflow-hidden transform translate-y-4 scale-95 opacity-0 transition-all duration-300 pointer-events-none border border-white/60">
+      <!-- Detail Header pill (dark blue) -->
+      <div id="layerDetailHeader" class="bg-[#182168] rounded-t-[26px] px-5 py-2.5 shrink-0 flex items-center justify-between min-h-[52px]">
+        <div class="flex flex-col gap-0.5">
+          <h3 id="layerDetailTitle" class="text-white text-[11px] font-semibold leading-tight tracking-tight"></h3>
+          <p id="layerDetailSubtitle" class="text-white/70 text-[8px] italic leading-tight"></p>
+        </div>
+        <button id="layerDetailCloseBtn" class="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 text-white flex items-center justify-center shrink-0 transition cursor-pointer" title="Close">
+          <i class="fa-solid fa-xmark text-[12px]"></i>
+        </button>
+      </div>
+      <!-- Detail Variables list -->
+      <div class="bg-[#f6f5f5] flex-1 overflow-y-auto custom-scrollbar">
+        <div id="layerDetailList" class="px-5 divide-y divide-[#ddd]">
+          <!-- Variable rows populated dynamically -->
+        </div>
+      </div>
+      <div class="bg-[#f6f5f5] border-t border-[#ddd] px-5 py-3 rounded-b-[16px] shrink-0 flex justify-end">
+        <button id="layerDetailBackBtn" class="h-8 px-4 rounded-[10px] bg-[#182168] hover:bg-[#1a4999] text-white flex items-center justify-center gap-2 transition cursor-pointer text-[11px] font-semibold" type="button">
+          <i class="fa-solid fa-arrow-left text-[10px]"></i>
+          Back
+        </button>
+      </div>
+    </div>
+  </section>
+
+  
+  <!-- ============================================================
+       NOTIFICATION: "See All" Modal (Figma: node 3894-2727)
+       ============================================================ -->
+  <div id="allNotificationsModal" class="fixed inset-0 z-[60] flex items-center justify-center hidden" aria-hidden="true">
+    <!-- Backdrop -->
+    <div id="allNotifBackdrop" class="absolute inset-0 bg-[#0d1230]/60 backdrop-blur-sm"></div>
+
+    <!-- Modal Card -->
+    <div id="allNotifCard" class="relative bg-white w-[min(560px,94vw)] max-h-[85vh] rounded-[24px] shadow-2xl flex flex-col overflow-hidden z-10 border border-white/40 transform scale-95 opacity-0 transition-all duration-300">
+
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-[42px] h-[42px] rounded-[14px] bg-[#182168] flex items-center justify-center">
+            <i class="fa-regular fa-bell text-white text-[16px]"></i>
+          </div>
+          <div>
+            <h2 class="text-[16px] font-bold text-[#182168] tracking-tight">All Notifications</h2>
+            <p class="text-[11px] text-slate-400 mt-0.5">2 unread notifications</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="modalMarkAllReadBtn" class="text-[11px] text-[#1a4999] font-semibold hover:text-[#182168] transition-colors px-3 py-1.5 rounded-[8px] hover:bg-slate-100">Mark all read</button>
+          <button id="allNotifCloseBtn" class="w-9 h-9 rounded-[10px] bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition flex items-center justify-center" title="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="px-6 pt-4 pb-3 flex items-center gap-2 shrink-0">
+        <button class="all-notif-tab is-active text-[11px] font-semibold px-4 py-1.5 rounded-[20px] transition-all" data-filter="all">All</button>
+        <button class="all-notif-tab text-[11px] font-semibold px-4 py-1.5 rounded-[20px] transition-all" data-filter="unread">Unread</button>
+        <button class="all-notif-tab text-[11px] font-semibold px-4 py-1.5 rounded-[20px] transition-all" data-filter="alerts">Alerts</button>
+        <button class="all-notif-tab text-[11px] font-semibold px-4 py-1.5 rounded-[20px] transition-all" data-filter="system">System</button>
+      </div>
+
+      <!-- Search & Period Filter -->
+      <div class="px-6 pb-4 shrink-0 flex items-center gap-3">
+        <div class="flex items-center gap-2 bg-[#f4f5fb] rounded-[12px] px-4 h-[40px] flex-1">
+          <i class="fa-solid fa-magnifying-glass text-slate-400 text-[12px]"></i>
+          <input type="text" id="notifSearchInput" placeholder="Search notifications..." class="bg-transparent border-none outline-none text-[12px] text-slate-700 placeholder-slate-400 w-full font-medium" />
+        </div>
+        <!-- Period Filter Dropdown -->
+        <div class="relative shrink-0">
+          <button id="notifPeriodBtn" class="flex items-center gap-2 bg-[#f4f5fb] rounded-[12px] px-3 h-[40px] w-[140px] cursor-pointer hover:bg-[#eef0f8] transition-colors border border-transparent focus-within:border-[#1a4999]/20 relative text-left outline-none">
+            <i class="fa-regular fa-calendar text-slate-400 text-[12px]"></i>
+            <span id="notifPeriodLabel" class="text-[12px] text-slate-700 font-medium truncate flex-1">Any Time</span>
+            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
+          </button>
+          
+          <!-- Dropdown Menu -->
+          <div id="notifPeriodMenu" class="absolute right-0 top-[46px] w-[180px] bg-white rounded-[16px] shadow-[0_16px_48px_rgba(24,33,104,0.18)] border border-[rgba(24,33,104,0.08)] overflow-hidden z-[70] opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-right">
+            <div class="flex flex-col py-2">
+              <button class="period-option text-left px-4 py-2 text-[12px] text-slate-700 hover:bg-[#f4f5fb] transition-colors font-medium" data-value="any">Any Time</button>
+              <button class="period-option text-left px-4 py-2 text-[12px] text-slate-700 hover:bg-[#f4f5fb] transition-colors font-medium" data-value="today">Today</button>
+              <button class="period-option text-left px-4 py-2 text-[12px] text-slate-700 hover:bg-[#f4f5fb] transition-colors font-medium" data-value="yesterday">Yesterday</button>
+              <button class="period-option text-left px-4 py-2 text-[12px] text-slate-700 hover:bg-[#f4f5fb] transition-colors font-medium" data-value="week">A week</button>
+              <button class="period-option text-left px-4 py-2 text-[12px] text-slate-700 hover:bg-[#f4f5fb] transition-colors font-medium" data-value="month">A month</button>
+              <div class="h-[1px] bg-slate-100 my-1"></div>
+              <div class="relative">
+                <button class="period-option text-left px-4 py-2 text-[12px] text-[#1a4999] hover:bg-[#f4f5fb] transition-colors font-semibold w-full" data-value="custom">Custom (Datepicker)</button>
+                <input type="text" id="notifPeriodCustomInput" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" style="pointer-events: none;" />
               </div>
             </div>
-            <p class="text-xs">Last Updated <span class="font-semibold">06:22 AM</span></p>
-          </div>
-
-          <div class="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 py-3 sm:gap-4 sm:px-5">
-        <article class="metric-card glass-soft min-w-[188px] snap-start rounded-2xl border p-3">
-          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300">Wave Height Zones</p>
-          <ul class="mt-2 space-y-1 text-xs">
-            <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>Safe (&lt; 2m)</li>
-            <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-orange-400"></span>Caution (2-3m)</li>
-            <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-red-400"></span>Dangerous (&gt; 3m)</li>
-          </ul>
-        </article>
-        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
-          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-wind mr-1 text-[10px]"></i>Wind</p>
-          <p class="mt-2 text-3xl font-semibold leading-none">12</p>
-          <p class="mt-1 text-xs text-slate-300">knots</p>
-        </article>
-        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
-          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-compass mr-1 text-[10px]"></i>Direction</p>
-          <p class="mt-2 text-3xl font-semibold leading-none">ENE</p>
-          <p class="mt-1 text-xs text-slate-300">cardinal</p>
-        </article>
-        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
-          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-water mr-1 text-[10px]"></i>Waves</p>
-          <p class="mt-2 text-3xl font-semibold leading-none">1.8</p>
-          <p class="mt-1 text-xs text-slate-300">meters</p>
-        </article>
-        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
-          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-water-arrow-up-down mr-1 text-[10px]"></i>Tide</p>
-          <p class="mt-2 text-3xl font-semibold leading-none">2.3</p>
-          <p class="mt-1 text-xs text-slate-300">meters</p>
-        </article>
-        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
-          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-temperature-half mr-1 text-[10px]"></i>Temp</p>
-          <p class="mt-2 text-3xl font-semibold leading-none">27</p>
-          <p class="mt-1 text-xs text-slate-300">celsius</p>
-        </article>
-        <article class="metric-card glass-soft min-w-[132px] snap-start rounded-2xl border p-3">
-          <p class="text-[10px] uppercase tracking-[0.15em] text-slate-300"><i class="fa-solid fa-eye mr-1 text-[10px]"></i>Visibility</p>
-          <p class="mt-2 text-3xl font-semibold leading-none">8.5</p>
-          <p class="mt-1 text-xs text-slate-300">km</p>
-        </article>
           </div>
         </div>
       </div>
 
-      <div class="timeline-shell mt-2 overflow-x-auto rounded-xl border px-3 py-2">
-        <div class="flex min-w-[940px] items-center gap-2 text-[11px] text-slate-300">
-          <span class="rounded-lg bg-blue-700/80 px-2.5 py-1 text-[10px] font-medium text-white">Rabu 4</span>
-          <span class="timeline-chip">00:00</span><span class="timeline-chip">00:30</span><span class="timeline-chip">01:00</span><span class="timeline-chip">01:30</span>
-          <span class="timeline-chip">02:00</span><span class="timeline-chip">02:30</span><span class="timeline-chip">03:00</span><span class="timeline-chip">03:30</span>
-          <span class="timeline-chip">04:00</span><span class="timeline-chip">04:30</span><span class="timeline-chip">05:00</span><span class="timeline-chip">05:30</span>
-          <span class="timeline-chip">06:00</span><span class="timeline-chip">06:30</span>
+      <!-- Notifications Scrollable List -->
+      <div class="flex-1 overflow-y-auto divide-y divide-slate-100 custom-scrollbar">
+
+        <!-- Group: Today -->
+        <div class="px-6 py-2 bg-slate-50/80 shrink-0">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Today</span>
         </div>
+
+        <!-- Item 1 – Unread Alert -->
+        <div class="all-notif-item flex items-start gap-4 px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-type="alerts" data-unread="true">
+         
+       
+          <div class="w-[24px] h-[24px] rounded-[12px] bg-[#fff3f3] flex items-center justify-center shrink-0 mt-0.5">
+            <div class="w-2 h-2 rounded-full bg-[#fb2c36]"></div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-[13px] font-bold text-[#182168] leading-snug">High Wave Alert – Selat Sunda</p>
+                <span class="inline-flex items-center gap-1 mt-1 bg-[#fff3f3] text-[#fb2c36] text-[9px] font-bold px-2 py-0.5 rounded-full">
+                  <i class="fa-solid fa-circle text-[5px]"></i> ALERT
+                </span>
+              </div>
+              <div class="flex flex-col items-end gap-1 shrink-0">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#fb2c36]"></span>
+                <span class="text-[10px] text-slate-400">2 min ago</span>
+              </div>
+            </div>
+            <p class="text-[12px] text-slate-500 mt-1.5 leading-relaxed">Wave height exceeded 3.2m at Selat Sunda monitoring station. Vessels advised to exercise caution in the area.</p>
+          </div>
+        </div>
+
+        <!-- Item 2 – Unread Alert -->
+        <div class="all-notif-item flex items-start gap-4 px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-type="alerts" data-unread="true">
+         
+            <div class="w-[24px] h-[24px] rounded-[12px] bg-[#fff7f3] flex items-center justify-center shrink-0 mt-0.5">
+            <div class="w-2 h-2 rounded-full bg-[#f97316]"></div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-[13px] font-bold text-[#182168] leading-snug">Wind Speed Update – Laut Jawa</p>
+                <span class="inline-flex items-center gap-1 mt-1 bg-[#fff7ed] text-[#f97316] text-[9px] font-bold px-2 py-0.5 rounded-full">
+                  <i class="fa-solid fa-circle text-[5px]"></i> WARNING
+                </span>
+              </div>
+              <div class="flex flex-col items-end gap-1 shrink-0">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#fb2c36]"></span>
+                <span class="text-[10px] text-slate-400">18 min ago</span>
+              </div>
+            </div>
+            <p class="text-[12px] text-slate-500 mt-1.5 leading-relaxed">Wind speed 45 knots recorded in Laut Jawa, approaching storm threshold. BMKG monitoring continues.</p>
+          </div>
+        </div>
+
+        <!-- Group: Earlier Today -->
+        <div class="px-6 py-2 bg-slate-50/80 shrink-0">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Earlier Today</span>
+        </div>
+
+        <!-- Item 3 – Read / System -->
+        <div class="all-notif-item flex items-start gap-4 px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-type="system" data-unread="false">
+          
+<div class="w-[24px] h-[24px] rounded-[12px] bg-[#f0f3ff] flex items-center justify-center shrink-0 mt-0.5">
+  <div class="w-2 h-2 rounded-full bg-[#1a4999]"></div>
+</div>
+          
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-[13px] font-semibold text-slate-700 leading-snug">Radar Data Refreshed – Surabaya</p>
+                <span class="inline-flex items-center gap-1 mt-1 bg-[#f0f4ff] text-[#1a4999] text-[9px] font-bold px-2 py-0.5 rounded-full">
+                  <i class="fa-solid fa-circle text-[5px]"></i> SYSTEM
+                </span>
+              </div>
+              <span class="text-[10px] text-slate-400 shrink-0">1 hr ago</span>
+            </div>
+            <p class="text-[12px] text-slate-400 mt-1.5 leading-relaxed">Local radar imagery updated successfully for Surabaya region. New data cycle: 09:00–10:00 WIB.</p>
+          </div>
+        </div>
+
+        <!-- Item 4 – Read / System -->
+        <div class="all-notif-item flex items-start gap-4 px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-type="system" data-unread="false">
+        
+<div class="w-[24px] h-[24px] rounded-[12px] bg-[#f0fdf4] flex items-center justify-center shrink-0 mt-0.5">
+  <div class="w-2 h-2 rounded-full bg-[#22c55e]"></div>
+</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-[13px] font-semibold text-slate-700 leading-snug">Model Run Completed – INAFLOWS</p>
+                <span class="inline-flex items-center gap-1 mt-1 bg-[#f0fdf4] text-[#22c55e] text-[9px] font-bold px-2 py-0.5 rounded-full">
+                  <i class="fa-solid fa-circle text-[5px]"></i> SUCCESS
+                </span>
+              </div>
+              <span class="text-[10px] text-slate-400 shrink-0">3 hr ago</span>
+            </div>
+            <p class="text-[12px] text-slate-400 mt-1.5 leading-relaxed">INAFLOWS 72-hour forecast model run completed without errors. Next run scheduled at 18:00 UTC.</p>
+          </div>
+        </div>
+
+        <!-- Item 5 – Read / System -->
+        <div class="all-notif-item flex items-start gap-4 px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-type="system" data-unread="false">
+          
+<div class="w-[24px] h-[24px] rounded-[12px] bg-[#f0fdf4] flex items-center justify-center shrink-0 mt-0.5">
+  <div class="w-2 h-2 rounded-full bg-[#22c55e]"></div>
+</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-[13px] font-semibold text-slate-700 leading-snug">Model Run Completed – INAWAVES</p>
+                <span class="inline-flex items-center gap-1 mt-1 bg-[#f0fdf4] text-[#22c55e] text-[9px] font-bold px-2 py-0.5 rounded-full">
+                  <i class="fa-solid fa-circle text-[5px]"></i> SUCCESS
+                </span>
+              </div>
+              <span class="text-[10px] text-slate-400 shrink-0">5 hr ago</span>
+            </div>
+            <p class="text-[12px] text-slate-400 mt-1.5 leading-relaxed">INAWAVES wave model run finished. Forecast covers 48 hours for Indonesian maritime zones.</p>
+          </div>
+        </div>
+
+        <!-- Group: Yesterday -->
+        <div class="px-6 py-2 bg-slate-50/80 shrink-0">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Yesterday</span>
+        </div>
+
+        <!-- Item 6 – Read / Alert -->
+        <div class="all-notif-item flex items-start gap-4 px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer" data-type="alerts" data-unread="false">
+          
+<div class="w-[24px] h-[24px] rounded-[12px] bg-[#f3f6ff] flex items-center justify-center shrink-0 mt-0.5">
+  <div class="w-2 h-2 rounded-full bg-[#1a4999]"></div>
+</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-[13px] font-semibold text-slate-700 leading-snug">Tide Level Advisory – Tanjung Priok</p>
+                <span class="inline-flex items-center gap-1 mt-1 bg-[#f0f4ff] text-[#1a4999] text-[9px] font-bold px-2 py-0.5 rounded-full">
+                  <i class="fa-solid fa-circle text-[5px]"></i> ADVISORY
+                </span>
+              </div>
+              <span class="text-[10px] text-slate-400 shrink-0">Yesterday</span>
+            </div>
+            <p class="text-[12px] text-slate-400 mt-1.5 leading-relaxed">High tide of 1.8m expected at Tanjung Priok at 14:30 WIB. Port operations may be affected.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between shrink-0">
+        <span class="text-[11px] text-slate-400">Showing 6 of 24 notifications</span>
+        <button class="h-[36px] px-5 bg-[#182168] hover:bg-[#182168]/90 text-white rounded-[10px] text-[12px] font-semibold transition-all shadow-sm flex items-center gap-2">
+          <i class="fa-solid fa-arrow-down text-[10px]"></i>
+          Load More
+        </button>
       </div>
     </div>
-  </footer>
+  </div>
 
-  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-  <script src="assets/js/app.js"></script>
+
+<script>
+  (function () {
+    const savedTheme = localStorage.getItem("theme");
+    const theme = savedTheme || "dark";
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.dataset.theme = theme;
+  })();
+</script>
+
+<script src="assets/js/tailwind.config.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="assets/js/app.js"></script>
+
+
 </body>
 </html>

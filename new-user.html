@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User - Admin</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="assets/js/tailwind.config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Project CSS: Global -->
+    <link rel="stylesheet" href="assets/css/global/variables.css">
+    <link rel="stylesheet" href="assets/css/global/reset.css">
+    <link rel="stylesheet" href="assets/css/global/utilities.css">
+
+    <!-- Project CSS: Components -->
+    <link rel="stylesheet" href="assets/css/components/sidebar.css">
+    <link rel="stylesheet" href="assets/css/components/global-select.css">
+    <link rel="stylesheet" href="assets/css/components/global-multiselect.css">
+</head>
+<body class="flex h-screen overflow-hidden text-slate-800">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden transition-opacity opacity-0 duration-300"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-[256px] h-full bg-[#182168] flex flex-col shrink-0 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-50 md:flex">
+        <div class="sidebar-gradient w-full h-full absolute inset-0 pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col h-full w-full">
+            <!-- Logo -->
+            <div class="pt-[32px] px-[20px] pb-[20px] flex justify-center w-full">
+                <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="h-[56px] w-auto object-contain">
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex-1 px-0 flex flex-col gap-[12px] w-full">
+                <!-- Dashboard Link -->
+                <a href="dashboard.html" class="flex items-center px-[20px] py-[8px] hover:bg-white/10 transition-colors text-white">
+                    <i class="fa-solid fa-home w-[24px] text-center text-[18px]"></i>
+                    <span class="ml-[8px] font-semibold text-[16px]">Dashboard</span>
+                </a>
+
+                <!-- Management Group -->
+                <div class="flex flex-col w-full">
+                    <div id="managementToggle" class="flex items-center justify-between px-[20px] py-[8px] text-white cursor-pointer hover:bg-white/5 transition-colors">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-users w-[24px] text-center text-[18px]"></i>
+                            <span class="ml-[8px] font-semibold text-[16px]">Management</span>
+                        </div>
+                        <i id="managementIcon" class="fa-solid fa-plus text-[14px] transition-transform duration-300"></i>
+                    </div>
+                    
+                    <!-- Sub-links -->
+                    <div id="managementSubMenu" class="flex flex-col items-center gap-[12px] w-full overflow-hidden transition-all duration-300" style="max-height: 0; margin-top: 0;">
+                        <a href="role-management.html" class="w-[216px] py-[8px] px-[36px] text-white text-[16px] hover:bg-white/10 rounded-[8px] transition-colors">
+                            Role Management
+                        </a>
+                        <a href="user-management.html" class="w-[216px] py-[8px] px-[36px] text-white text-[16px] hover:bg-white/10 rounded-[8px] transition-colors">
+                            User Management
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Activity Logs -->
+                <a href="activity-log.html" class="flex items-center px-[20px] py-[8px] text-white hover:bg-white/5 transition-colors">
+                    <i class="fa-solid fa-book w-[24px] text-center text-[18px]"></i>
+                    <span class="ml-[8px] font-semibold text-[16px]">Activity Logs</span>
+                </a>
+            </div>
+
+            <!-- User Profile Bottom -->
+            <div class="px-[20px] pb-[20px] pt-[20px] flex items-center justify-between mt-auto w-full border-t border-white/10">
+                <div class="flex items-center gap-[9px] text-white overflow-hidden">
+                    <div class="w-[32px] h-[32px] rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-user text-[14px]"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-[16px] leading-tight">AdminUser</span>
+                        <span class="text-[14px] leading-tight text-white/70">Admin</span>
+                    </div>
+                </div>
+                <a href="login.html" class="text-white hover:text-red-400 transition-colors p-2" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket text-[18px]"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto bg-[#f9fbfc] relative">
+        <!-- Mobile Header -->
+        <div class="md:hidden flex items-center justify-between p-4 bg-[#182168] text-white">
+            <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="h-8 w-auto">
+            <span class="font-bold">New User</span>
+            <button id="mobileMenuBtn"><i class="fa-solid fa-bars text-xl"></i></button>
+        </div>
+
+        <div class="mx-auto px-[16px] md:px-[32px] py-[21px] flex flex-col gap-[24px]">
+            <!-- Header Area -->
+            <div class="flex flex-col md:flex-row gap-3 justify-between items-start md:items-center w-full">
+                <div class="flex flex-wrap items-center text-[14px] md:text-[16px] font-medium text-[#71717a] gap-y-1">
+                    <span>Management</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] md:text-[12px] mx-[6px] md:mx-[8px]"></i>
+                    <span>User Management</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] md:text-[12px] mx-[6px] md:mx-[8px]"></i>
+                    <span class="text-[#4658ac]">Add New User</span>
+                </div>
+                
+                <div class="flex items-center gap-[6px] w-full md:w-auto justify-between md:justify-end">
+                    <a href="index.html" target="blank_"
+                        class="px-[16px] py-[8px] border border-[#d4d4d8] rounded-[10px] text-[14px] text-[#27272a] hover:bg-gray-50 transition-colors bg-white">
+                        Main Dashboard
+                    </a>
+                    <button class="w-[50px] h-[50px] rounded-[16px] bg-white border border-gray-200 flex items-center justify-center relative hover:bg-gray-50 transition-colors">
+                        <i class="fa-regular fa-bell text-[20px] text-gray-600"></i>
+                        <span class="absolute top-2 right-2 bg-[#fb2c36] text-white text-[10px] font-bold w-[20px] h-[15px] flex items-center justify-center rounded-full">2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Title Area -->
+            <div class="border-b border-[#71717a]/50 pb-[12px] flex flex-col gap-[12px]">
+                <h1 class="text-[24px] font-semibold text-black">New User</h1>
+                <p class="text-[16px] font-normal text-[#71717a]">Fill in the details to add a new user.</p>
+            </div>
+
+            <!-- Form Sections -->
+            <div class="flex flex-col gap-[21px] w-full mb-10">
+                
+                <!-- Section 1: User Details -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[21px] md:p-[24px] flex flex-col gap-[24px] w-full shadow-sm">
+                    <div class="border-b border-black/10 pb-[12px] w-full">
+                        <h2 class="text-[16px] font-normal text-[#71717a]">User Details</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px] w-full">
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">First Name</label>
+                            <input type="text" placeholder="Insert first name" class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors placeholder-[#a1a1aa]">
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">Last Name</label>
+                            <input type="text" placeholder="Insert last name" class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors placeholder-[#a1a1aa]">
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">Gender</label>
+                            <div class="relative">
+                                <select class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors bg-white appearance-none cursor-pointer text-[#a1a1aa]">
+                                    <option value="" disabled selected>Choose gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">Last Education</label>
+                            <div class="relative">
+                                <select class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors bg-white appearance-none cursor-pointer text-[#a1a1aa]">
+                                    <option value="" disabled selected>Choose</option>
+                                    <option value="s1">Bachelor's Degree (S1)</option>
+                                    <option value="s2">Master's Degree (S2)</option>
+                                    <option value="s3">Doctoral Degree (S3)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">University Name</label>
+                            <input type="text" placeholder="Insert university name" class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors placeholder-[#a1a1aa]">
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">Major</label>
+                            <div class="relative">
+                                <select class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors bg-white appearance-none cursor-pointer text-[#a1a1aa]">
+                                    <option value="" disabled selected>Choose</option>
+                                    <option value="it">Information Technology</option>
+                                    <option value="meteorology">Meteorology</option>
+                                    <option value="geophysics">Geophysics</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">Job Title</label>
+                            <input type="text" placeholder="Insert job title" class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors placeholder-[#a1a1aa]">
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">Institution</label>
+                            <input type="text" placeholder="Insert institution" class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors placeholder-[#a1a1aa]">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Account & Security -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[21px] md:p-[24px] flex flex-col gap-[24px] w-full shadow-sm">
+                    <div class="border-b border-black/10 pb-[12px] w-full">
+                        <h2 class="text-[16px] font-normal text-[#71717a]">Account & Security</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px] w-full max-w-[800px]">
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">Username</label>
+                            <input type="text" placeholder="Insert username" class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors placeholder-[#a1a1aa]">
+                        </div>
+                        <div class="flex flex-col gap-[8px]">
+                            <label class="text-[16px] text-[#71717a]">Email</label>
+                            <input type="email" placeholder="Insert email" class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors placeholder-[#a1a1aa]">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: User Role -->
+                <div class="bg-white border border-black/10 rounded-[21px] p-[21px] md:p-[24px] flex flex-col gap-[24px] w-full shadow-sm">
+                    <div class="border-b border-black/10 pb-[12px] w-full">
+                        <h2 class="text-[16px] font-normal text-[#71717a]">User Role</h2>
+                    </div>
+                    
+                    <div class="w-full md:w-[276px]">
+                        <div class="relative">
+                            <select class="w-full border border-[#a3a3a9] rounded-[12px] p-[16px] text-[14px] outline-none focus:border-[#4658ac] transition-colors bg-white appearance-none cursor-pointer text-[#18181b]">
+                                <option value="public">Public</option>
+                                <option value="forecaster">Forecaster</option>
+                                <option value="registered">Registered User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="flex flex-col md:flex-row justify-end items-center gap-[8px] mt-4">
+                    <button onclick="window.location.href='user-management.html'" class="w-full md:w-[150px] h-[48px] border border-[#d4d4d8] rounded-[10px] flex items-center justify-center text-[12px] text-[#27272a] hover:bg-gray-50 transition-colors bg-white">
+                        Cancel
+                    </button>
+                    <button class="w-full md:w-[150px] h-[48px] bg-[#1a4999] rounded-[10px] flex items-center justify-center text-[12px] text-white hover:bg-[#153a7a] transition-colors font-bold">
+                        Create User
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Project JS: Components -->
+    <script src="assets/js/components/global-select.js"></script>
+    <script src="assets/js/components/global-multiselect.js"></script>
+    <script src="assets/js/components/sidebar.js"></script>
+</body>
+</html>

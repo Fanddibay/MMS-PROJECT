@@ -1,0 +1,399 @@
+/* ============================================================
+   COMPONENT: Global Multi-Select Styles
+   
+   A custom premium multi-select dropdown replacement using checkboxes.
+   Supports search filtering, chip tags, and sticky actions footer.
+   ============================================================ */
+
+:root {
+  --ms-bg: #ffffff;
+  --ms-border: rgba(0, 0, 0, 0.1);
+  --ms-text: #18181b;
+  --ms-text-muted: #71717a;
+  --ms-hover-bg: #f4f4f5;
+  --ms-active-border: #131C55;
+  --ms-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ms-panel-bg: #ffffff;
+  --ms-panel-border: rgba(0, 0, 0, 0.08);
+  --ms-selected-bg: rgba(19, 28, 85, 0.04);
+  --ms-primary: #131C55;
+  --ms-primary-hover: #0e143c;
+  --ms-chip-bg: rgba(19, 28, 85, 0.08);
+  --ms-chip-text: #131C55;
+  --ms-chip-border: rgba(19, 28, 85, 0.15);
+}
+
+/* Dark mode overrides */
+.dark, [data-theme="dark"] {
+  --ms-bg: #1e293b;
+  --ms-border: rgba(255, 255, 255, 0.1);
+  --ms-text: #f8fafc;
+  --ms-text-muted: #94a3b8;
+  --ms-hover-bg: #334155;
+  --ms-active-border: #4f46e5;
+  --ms-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --ms-panel-bg: #1e293b;
+  --ms-panel-border: rgba(255, 255, 255, 0.15);
+  --ms-selected-bg: rgba(79, 70, 229, 0.1);
+  --ms-primary: #4f46e5;
+  --ms-primary-hover: #4338ca;
+  --ms-chip-bg: rgba(56, 189, 248, 0.15);
+  --ms-chip-text: #38bdf8;
+  --ms-chip-border: rgba(56, 189, 248, 0.25);
+}
+
+/* Container wrapper */
+.global-multiselect-container {
+  position: relative;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  user-select: none;
+}
+
+/* Trigger element */
+.global-multiselect-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 41px;
+  padding: 6px 16px;
+  background-color: var(--ms-bg);
+  border: 1.3px solid var(--ms-border);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--ms-text);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.global-multiselect-trigger:hover {
+  border-color: var(--ms-primary);
+  box-shadow: 0 0 0 1px var(--ms-primary);
+}
+
+.global-multiselect-trigger:focus,
+.global-multiselect-container.is-open .global-multiselect-trigger {
+  border-color: var(--ms-primary);
+  box-shadow: 0 0 0 3px rgba(19, 28, 85, 0.15);
+  scroll-margin: 0;
+}
+
+.dark .global-multiselect-trigger:focus,
+.dark .global-multiselect-container.is-open .global-multiselect-trigger {
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+/* Label text or chips wrapper */
+.global-multiselect-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  max-width: 90%;
+}
+
+.global-multiselect-label.is-placeholder {
+  color: var(--ms-text-muted);
+}
+
+/* Beautiful chip layout */
+.global-multiselect-chip {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--ms-chip-bg);
+  color: var(--ms-chip-text);
+  border: 1px solid var(--ms-chip-border);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.global-multiselect-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 10px;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.global-multiselect-chip-remove:hover {
+  opacity: 1;
+}
+
+/* Custom chevron icon with smooth animation */
+.global-multiselect-chevron {
+  font-size: 11px;
+  color: var(--ms-text-muted);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: auto;
+}
+
+.global-multiselect-container.is-open .global-multiselect-chevron {
+  transform: rotate(180deg);
+  color: var(--ms-primary);
+}
+
+/* Floating dropdown panel */
+.global-multiselect-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background-color: var(--ms-panel-bg);
+  border: 1px solid var(--ms-panel-border);
+  border-radius: 14px;
+  box-shadow: var(--ms-shadow);
+  z-index: 1000;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.global-multiselect-container.is-open .global-multiselect-dropdown {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Search Box container */
+.global-multiselect-search-container {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ms-panel-border);
+  background-color: rgba(0, 0, 0, 0.01);
+  position: relative;
+}
+
+.global-multiselect-search {
+  width: 100%;
+  height: 34px;
+  padding: 8px 12px 8px 32px;
+  font-size: 13px;
+  color: var(--ms-text);
+  background-color: var(--ms-hover-bg);
+  border: 1px solid var(--ms-border);
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.global-multiselect-search:focus {
+  border-color: var(--ms-primary);
+  background-color: var(--ms-bg);
+  scroll-margin: 0;
+}
+
+.global-multiselect-search-container .search-icon {
+  position: absolute;
+  left: 22px;
+  font-size: 12px;
+  color: var(--ms-text-muted);
+  pointer-events: none;
+}
+
+/* Options wrapper with custom scrollbar */
+.global-multiselect-options {
+  max-height: 200px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+}
+
+.global-multiselect-options::-webkit-scrollbar {
+  width: 6px;
+}
+
+.global-multiselect-options::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.global-multiselect-options::-webkit-scrollbar-thumb {
+  background-color: var(--ms-border);
+  border-radius: 10px;
+}
+
+.global-multiselect-options::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ms-text-muted);
+}
+
+/* Individual option styling with checkbox */
+.global-multiselect-option {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--ms-text);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  gap: 10px;
+}
+
+.global-multiselect-option:hover {
+  background-color: var(--ms-hover-bg);
+}
+
+.global-multiselect-option.is-selected {
+  background-color: var(--ms-selected-bg);
+  font-weight: 500;
+}
+
+/* Custom Checkbox Design */
+.global-multiselect-checkbox-custom {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--ms-border);
+  border-radius: 5px;
+  background-color: var(--ms-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.global-multiselect-option.is-selected .global-multiselect-checkbox-custom {
+  background-color: var(--ms-primary);
+  border-color: var(--ms-primary);
+}
+
+.global-multiselect-checkbox-custom::after {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 10px;
+  color: #ffffff;
+  display: none;
+}
+
+.global-multiselect-option.is-selected .global-multiselect-checkbox-custom::after {
+  display: block;
+}
+
+.global-multiselect-option-label {
+  flex-1: 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Disabled option */
+.global-multiselect-option.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: transparent !important;
+}
+
+/* Sticky Footer actions panel */
+.global-multiselect-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-top: 1px solid var(--ms-panel-border);
+  background-color: var(--ms-panel-bg);
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.global-multiselect-clear {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ms-text-muted);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.global-multiselect-clear:hover {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.global-multiselect-apply {
+  background-color: var(--ms-primary);
+  color: #ffffff;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 4px rgba(19, 28, 85, 0.1);
+}
+
+.global-multiselect-apply:hover {
+  background-color: var(--ms-primary-hover);
+}
+
+/* Disabled select state */
+.global-multiselect-container.is-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.global-multiselect-container.is-disabled .global-multiselect-trigger {
+  background-color: var(--ms-hover-bg);
+  cursor: not-allowed;
+}
+
+/* Error/validation state */
+.global-multiselect-container.has-error .global-multiselect-trigger {
+  border-color: #ef4444;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  .global-multiselect-trigger {
+    min-height: 44px; /* Touch-friendly height */
+  }
+  
+  .global-multiselect-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.15);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .global-multiselect-container.is-open .global-multiselect-dropdown {
+    transform: translateY(0);
+  }
+  
+  /* Mobile background backdrop overlay when multiselect is open */
+  .global-multiselect-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 990;
+    backdrop-filter: blur(2px);
+    display: none;
+  }
+  
+  .global-multiselect-container.is-open .global-multiselect-backdrop {
+    display: block;
+  }
+}

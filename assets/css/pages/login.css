@@ -1,0 +1,15 @@
+/* ============================================================
+   PAGE: Login
+   
+   Login-specific styles for the background gradient and
+   typography. Used only on login.html.
+   ============================================================ */
+
+.login-bg-gradient {
+    background: linear-gradient(8.5deg, rgba(24, 33, 104, 0.063) 0%, rgba(255, 255, 255, 0) 100%), 
+                linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 100%);
+}
+
+.tracking-widest-login {
+    letter-spacing: 0.3em;
+}
