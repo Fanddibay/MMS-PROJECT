@@ -22,56 +22,109 @@
   <section id="map" class="absolute inset-0 z-0"></section>
   <div class="map-vignette pointer-events-none absolute inset-0 z-10"></div>
 
+  <!-- Mobile Compact Header (visible < 768px) -->
+  <header id="mobileHeader" class="mobile-header fixed top-0 left-0 right-0 z-50 h-[56px] bg-[#182168] flex items-center px-3 gap-2 shadow-lg md:hidden">
+    <!-- Hamburger -->
+    <button id="mobileMenuBtn" type="button" class="w-[40px] h-[40px] rounded-[10px] text-white/80 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all shrink-0" title="Menu">
+      <i class="fa-solid fa-bars text-[16px]"></i>
+    </button>
+    <!-- BMKG Logo -->
+    <a href="dashboard.html" class="flex items-center gap-2 shrink-0" title="BMKG">
+      <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="h-[28px] w-auto object-contain" />
+    </a>
+    <!-- Location -->
+    <div class="flex items-center gap-2 min-w-0 flex-1">
+      <div class="w-[28px] h-[28px] bg-[#1a4999] rounded-[8px] flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-location-dot text-white text-[12px]"></i>
+      </div>
+      <div class="flex flex-col min-w-0 leading-tight">
+        <span class="font-bold text-white text-[13px] truncate">Tanjung Priok Port</span>
+        <span class="text-[10px] text-white/60 truncate">Jakarta, Indonesia</span>
+      </div>
+    </div>
+    <!-- Search toggle -->
+    <button id="mobileSearchToggle" type="button" class="w-[40px] h-[40px] rounded-[10px] text-white/80 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all shrink-0" title="Search">
+      <i class="fa-solid fa-magnifying-glass text-[14px]"></i>
+    </button>
+    <!-- Notifications -->
+    <button id="mobileNotifBtn" type="button" class="w-[40px] h-[40px] rounded-[10px] text-white/80 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all shrink-0 relative" title="Notifications">
+      <i class="fa-regular fa-bell text-[14px]"></i>
+      <span class="absolute top-1 right-1 w-[14px] h-[14px] bg-[#fb2c36] border border-[#182168] rounded-full flex items-center justify-center text-[8px] font-bold text-white">2</span>
+    </button>
+  </header>
+
+  <!-- Mobile Search Bar (expandable under header) -->
+  <div id="mobileSearchBar" class="mobile-search-bar fixed top-[56px] left-0 right-0 z-50 bg-[#182168] px-3 pb-3 hidden md:hidden">
+    <div class="bg-white/10 rounded-[12px] h-[40px] px-4 flex items-center gap-2 border border-white/10">
+      <i class="fa-solid fa-magnifying-glass text-white/50 text-[12px]"></i>
+      <input type="text" placeholder="Search location..." class="bg-transparent border-none outline-none text-white text-[13px] w-full placeholder-white/40 font-medium" />
+    </div>
+  </div>
+
+  <!-- Mobile Sidebar Drawer Overlay -->
+  <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden md:hidden"></div>
+
   <!-- Sidebar Pinned Left (Figma: new sidebar) -->
-  <aside id="leftSidebar" class="absolute left-0 top-0 bottom-0 z-30 w-[62px] bg-[#182168] border-r border-[#0e1629] flex flex-col items-center py-6 justify-between h-screen shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.25)]">
+  <aside id="leftSidebar" class="absolute left-0 top-0 bottom-0 z-30 w-[62px] bg-[#182168] border-r border-[#0e1629] flex flex-col items-center py-6 justify-between h-screen shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.25)] md:z-30">
     <div class="flex flex-col gap-6 items-center w-full">
       <!-- BMKG Logo -->
       <a href="dashboard.html" class="h-[46px] w-[36px] flex items-center justify-center shrink-0 mb-4" title="Main Dashboard">
         <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="w-full h-auto object-contain" />
+        <span class="sidebar-bmkg-label hidden text-white font-bold text-[13px] tracking-wide ml-2">BMKG</span>
       </a>
       
       <!-- Circle Icon Stack -->
-      <div class="flex flex-col gap-[18px] items-center w-full">
-        <button id="sidebarHomeBtn" type="button" class="sidebar-rail-btn w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Data Layers" aria-expanded="false" aria-controls="dataLayersPanel">
+      <div class="flex flex-col gap-[18px] items-center w-full px-2">
+        <button id="sidebarHomeBtn" type="button" class="sidebar-nav-item sidebar-rail-btn w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Data Layers" aria-expanded="false" aria-controls="dataLayersPanel">
           <i class="fa-solid fa-home text-[16px]"></i>
+          <span class="sidebar-nav-label">Data Layers</span>
         </button>
         
-        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Weather Model">
+        <button class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Weather Model">
           <i class="fa-solid fa-cloud-sun text-[16px]"></i>
+          <span class="sidebar-nav-label">Weather Model</span>
         </button>
         
-        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Stations">
+        <button class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Stations">
           <i class="fa-solid fa-location-dot text-[16px]"></i>
+          <span class="sidebar-nav-label">Stations</span>
         </button>
         
-        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Create Station">
+        <button class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Create Station">
           <i class="fa-solid fa-file-circle-plus text-[16px]"></i>
+          <span class="sidebar-nav-label">Create Station</span>
         </button>
         
-        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Map Views">
+        <button class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Map Views">
           <i class="fa-solid fa-map text-[16px]"></i>
+          <span class="sidebar-nav-label">Map Views</span>
         </button>
         
-        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Globe Views">
+        <button class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Globe Views">
           <i class="fa-solid fa-globe text-[16px]"></i>
+          <span class="sidebar-nav-label">Globe Views</span>
         </button>
         
-        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Alerts">
+        <button class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Alerts">
           <i class="fa-solid fa-triangle-exclamation text-[16px]"></i>
+          <span class="sidebar-nav-label">Alerts</span>
         </button>
         
         <div class="h-[1px] w-[36px] bg-white/20 my-1"></div>
         
-        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Waves">
+        <button class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Waves">
           <i class="fa-solid fa-water text-[16px]"></i>
+          <span class="sidebar-nav-label">Waves</span>
         </button>
         
-        <button id="windBtn" class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Wind">
+        <button id="windBtn" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Wind">
           <i class="fa-solid fa-compass text-[16px]"></i>
+          <span class="sidebar-nav-label">Wind</span>
         </button>
         
-        <button class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Vessels">
+        <button class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Vessels">
           <i class="fa-solid fa-ship text-[16px]"></i>
+          <span class="sidebar-nav-label">Vessels</span>
         </button>
       </div>
     </div>
@@ -91,55 +144,55 @@
   <div id="dataLayersPanel" class="fixed inset-y-0 left-0 sm:left-[78px] top-0 sm:top-[20px] bottom-0 sm:bottom-[20px] z-40 w-full sm:w-[360px] bg-white text-slate-800 rounded-none sm:rounded-[20px] shadow-[0_10px_25px_rgba(24,33,104,0.15)] flex flex-col transition-all duration-300 transform -translate-x-[400px] opacity-0 pointer-events-none">
     
     <!-- Backdrop for mobile/tablet clicks outside -->
-    <div id="dataLayersBackdrop" class="fixed inset-0 bg-slate-900/40 -z-10 block sm:hidden hidden opacity-0 transition-opacity duration-300"></div>
+    <div id="dataLayersBackdrop" class="fixed inset-0 bg-black/40 -z-10 block sm:hidden hidden opacity-0 transition-opacity duration-300"></div>
 
     <!-- Panel Shell (inner scrollable content container) -->
-    <div class="flex flex-col h-full overflow-hidden p-6 relative">
+    <div class="flex flex-col h-full overflow-hidden p-4 sm:p-6 relative">
       
       <!-- Header -->
       <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-[#1a4999] text-[18px] tracking-[0.1172px]">Data Layers</h2>
-        <button id="dataLayerCloseBtn" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors" title="Close Panel">
-          <i class="fa-solid fa-xmark text-lg"></i>
+        <h2 class="font-bold text-[#1a4999] text-[20px] tracking-[0.1172px]">Data Layers</h2>
+        <button id="dataLayerCloseBtn" class="w-8 h-8 flex items-center justify-center text-slate-800 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors" title="Close Panel">
+          <i class="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
 
       <!-- Search Location in Panel -->
-      <div class="relative bg-[#f1f1f1] h-[34px] rounded-[20px] mb-4 flex items-center px-4">
-        <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs mr-2"></i>
-        <input type="text" placeholder="Search..." class="bg-transparent border-none text-[12px] text-slate-800 placeholder-slate-400 focus:outline-none w-full" />
+      <div class="relative bg-[#f1f1f1] h-[42px] rounded-[24px] mb-4 flex items-center px-4">
+        <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm mr-2"></i>
+        <input type="text" placeholder="Search..." class="bg-transparent border-none text-[14px] text-slate-800 placeholder-slate-400 focus:outline-none w-full" />
       </div>
 
       <!-- Filters Section -->
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-1.5 text-[11px] text-slate-800">
-          <i class="fa-solid fa-circle-minus text-slate-500 text-xs"></i>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-1.5 text-[13px] text-slate-800 font-medium">
+          <i class="fa-solid fa-circle-minus text-slate-500 text-sm"></i>
           <span>Filter by</span>
         </div>
-        <div class="flex gap-1.5 items-center">
-          <button id="clearAllFiltersBtn" class="border border-[#d7d7d7] px-2.5 py-1 rounded-[15px] text-[11px] text-slate-800 hover:bg-slate-50 transition flex items-center gap-1">
+        <div class="flex gap-2 items-center">
+          <button id="clearAllFiltersBtn" class="border border-[#d7d7d7] px-3 py-1.5 rounded-[20px] text-[12px] text-slate-800 hover:bg-slate-50 transition flex items-center gap-1">
             <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
             Clear all
           </button>
-          <button id="activeFiltersBadge" class="border border-[#d7d7d7] px-2.5 py-1 rounded-[15px] text-[11px] text-slate-800 bg-slate-50 transition">
+          <button id="activeFiltersBadge" class="border border-[#d7d7d7] px-3 py-1.5 rounded-[20px] text-[12px] text-slate-800 bg-slate-50 transition">
             Active (0)
           </button>
-          <button class="border border-[#d7d7d7] px-2.5 py-1 rounded-[15px] text-[11px] text-slate-800 hover:bg-slate-50 transition">
+          <button class="border border-[#d7d7d7] px-3 py-1.5 rounded-[20px] text-[12px] text-slate-800 hover:bg-slate-50 transition">
             Map View
           </button>
         </div>
       </div>
 
 <!-- Scrollable Categories Stack (Figma: Data layer - open expand) -->
-      <div class="data-layers-scroll flex-1 overflow-y-auto pr-1 space-y-1 no-scrollbar">
+      <div class="data-layers-scroll flex-1 overflow-y-auto pr-1 no-scrollbar">
 
         <!-- Models -->
         <details class="data-group data-group-models" open>
-          <summary>Models</summary>
+          <summary class="data-group-header">Models</summary>
           <div class="data-group-card space-y-0">
             <!-- Inaflows -->
-            <details class="data-group nested" open>
-              <summary>Inaflows</summary>
+            <details class="nested-group">
+              <summary class="data-group-subheader">Inaflows</summary>
               <div class="space-y-1.5 pt-1 pb-3">
                 <!-- data layer 1 -->
                 <div class="flex items-center gap-2 justify-between">
@@ -147,15 +200,15 @@
                     <input type="checkbox" checked data-layer-id="salinity">
                     <span class="data-layer-label">Sea Water Salinity (S)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -166,15 +219,15 @@
                     <input type="checkbox" data-layer-id="eastward-velocity">
                     <span class="data-layer-label">Eastward Sea Water Velocity (u)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                  <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                    <i class="fa-solid fas fa-search-plus text-[12px]"></i>
-                  </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
+                    </button>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -185,15 +238,15 @@
                     <input type="checkbox" data-layer-id="surface-elevation">
                     <span class="data-layer-label">Sea Surface Elevation (zeta)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                  <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                    <i class="fa-solid fas fa-search-plus text-[12px]"></i>
-                  </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
+                    </button>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -204,15 +257,15 @@
                     <input type="checkbox" data-layer-id="temperature">
                     <span class="data-layer-label">Sea Water Temperature (T)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                  <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                    <i class="fa-solid fas fa-search-plus text-[12px]"></i>
-                  </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
+                    </button>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -223,15 +276,15 @@
                     <input type="checkbox" data-layer-id="northward-velocity">
                     <span class="data-layer-label">Northward Sea Water Velocity (v)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px]  text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -239,8 +292,8 @@
             </details>
 
             <!-- Inawaves -->
-            <details class="data-group nested">
-              <summary>Inawaves</summary>
+            <details class="nested-group">
+              <summary class="data-group-subheader">Inawaves</summary>
               <div class="space-y-1.5 pt-1 pb-3">
                 <!-- data layer hmax -->
                 <div class="flex items-center gap-2 justify-between">
@@ -248,15 +301,15 @@
                     <input type="checkbox" data-layer-id="hmax">
                     <span class="data-layer-label">Maximum Wave Height (hmax)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -266,15 +319,15 @@
                     <input type="checkbox" data-layer-id="dir">
                     <span class="data-layer-label">Mean Wave Direction (dir)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -284,15 +337,15 @@
                     <input type="checkbox" data-layer-id="lm">
                     <span class="data-layer-label">Mean Wavelength (lm)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -302,15 +355,15 @@
                     <input type="checkbox" data-layer-id="t01">
                     <span class="data-layer-label">Mean Wave Period (t01)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -320,15 +373,15 @@
                     <input type="checkbox" data-layer-id="ptp00">
                     <span class="data-layer-label">Primary Swell Period (ptp00)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -338,15 +391,15 @@
                     <input type="checkbox" data-layer-id="ptp01">
                     <span class="data-layer-label">Secondary Swell Period (ptp01)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -354,23 +407,23 @@
             </details>
 
             <!-- GFS -->
-            <details class="data-group nested">
-              <summary>GFS</summary>
+            <details class="nested-group">
+              <summary class="data-group-subheader">GFS</summary>
               <div class="space-y-1.5 pt-1 pb-1">
                 <div class="flex items-center gap-2 justify-between">
                   <label class="data-layer-row">
                     <input type="checkbox" data-layer-id="gfs-wind">
                     <span class="data-layer-label">Wind Speed (10m)</span>
                   </label>
-                  <div class="flex items-center gap-2">
-                    <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-search-plus text-[12px]"></i>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-search-plus text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fa-gear text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fa-gear text-[13px]"></i>
                     </button>
-                     <button type="button" class="w-[16px] h-[16px] rounded-[4px] text-black flex items-center justify-center">
-                      <i class="fa-solid fas fa-info-circle text-[12px]"></i>
+                    <button type="button" class="w-[24px] h-[24px] rounded-[6px] text-black hover:bg-slate-100 flex items-center justify-center transition-colors">
+                      <i class="fa-solid fas fa-info-circle text-[13px]"></i>
                     </button>
                   </div>
                 </div>
@@ -380,31 +433,31 @@
         </details>
 
         <!-- Other layer groups -->
-        <details class="data-group collapsed-group">
-          <summary>Observation Stations</summary>
+        <details class="data-group collapsed-group" open>
+          <summary class="data-group-header">Observation Stations</summary>
           <div class="data-group-card">
-            <p class="text-[10px] text-slate-600 leading-relaxed">Station layers will appear here.</p>
+            <p class="text-[12px] text-slate-600 leading-relaxed">Station layers will appear here.</p>
           </div>
         </details>
 
-        <details class="data-group collapsed-group">
-          <summary>Satelite</summary>
+        <details class="data-group collapsed-group" open>
+          <summary class="data-group-header">Satelite</summary>
           <div class="data-group-card">
-            <p class="text-[10px] text-slate-600 leading-relaxed">Satellite imagery layers will appear here.</p>
+            <p class="text-[12px] text-slate-600 leading-relaxed">Satellite imagery layers will appear here.</p>
           </div>
         </details>
 
-        <details class="data-group collapsed-group">
-          <summary>Radar</summary>
+        <details class="data-group collapsed-group" open>
+          <summary class="data-group-header">Radar</summary>
           <div class="data-group-card">
-            <p class="text-[10px] text-slate-600 leading-relaxed">Radar layers will appear here.</p>
+            <p class="text-[12px] text-slate-600 leading-relaxed">Radar layers will appear here.</p>
           </div>
         </details>
 
-        <details class="data-group collapsed-group">
-          <summary>Cyclone Track Forecast</summary>
+        <details class="data-group collapsed-group" open>
+          <summary class="data-group-header">Cyclone Track Forecast</summary>
           <div class="data-group-card">
-            <p class="text-[10px] text-slate-600 leading-relaxed">Cyclone track layers will appear here.</p>
+            <p class="text-[12px] text-slate-600 leading-relaxed">Cyclone track layers will appear here.</p>
           </div>
         </details>
 
@@ -414,8 +467,8 @@
     </div>
   </div>
 
-  <!-- Centered Location Search Bar (Figma: Search Container) -->
-  <div class="absolute left-1/2 -translate-x-1/2 top-[20px] z-30 w-[510px] h-[69px] bg-white rounded-[10px] shadow-[0_10px_25px_rgba(24,33,104,0.15)] px-[18px] py-[14px] flex items-center gap-[10px] border border-[rgba(24,33,104,0.06)] pointer-events-auto">
+  <!-- Centered Location Search Bar (Figma: Search Container) - Desktop Only -->
+  <div class="desktop-search-bar absolute left-1/2 -translate-x-1/2 top-[20px] z-30 w-[510px] h-[69px] bg-white rounded-[10px] shadow-[0_10px_25px_rgba(24,33,104,0.15)] px-[18px] py-[14px] items-center gap-[10px] border border-[rgba(24,33,104,0.06)] pointer-events-auto hidden md:flex">
     <!-- Port info and label -->
     <div class="flex items-center gap-[8px] w-[188px] shrink-0">
       <div class="w-[34px] h-[34px] bg-[#1a4999] border border-white/20 rounded-[14px] flex items-center justify-center shrink-0">
@@ -433,8 +486,8 @@
     </div>
   </div>
 
-  <!-- Top Right widgets (Figma: Button Stack) -->
-  <div class="absolute right-[20px] top-[20px] z-30 flex flex-col gap-[12px] items-start pointer-events-auto">
+  <!-- Top Right widgets (Figma: Button Stack) - Desktop Only -->
+  <div class="desktop-top-right absolute right-[20px] top-[20px] z-30 flex flex-col gap-[12px] items-start pointer-events-auto hidden md:flex">
     <!-- Clock Button -->
     <button class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg" title="System Time">
       <i class="fa-regular fa-clock text-lg"></i>
@@ -445,8 +498,8 @@
     </button>
   </div>
 
-  <!-- Right Floating Utilities Widget stack (Figma: QuickAccessWidgets) -->
-  <div class="absolute right-[20px] top-[200px] z-30 flex flex-col gap-[12px] items-start pointer-events-auto">
+  <!-- Right Floating Utilities Widget stack (Figma: QuickAccessWidgets) - Desktop Only -->
+  <div class="desktop-right-toolbar absolute right-[20px] top-[200px] z-30 flex flex-col gap-[12px] items-start pointer-events-auto hidden md:flex">
     <!-- Notifications bell -->
     <div class="relative">
       <button id="notificationBtn" class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white relative flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg" title="Notifications">
@@ -554,60 +607,6 @@
       <button id="compassBtn" class="w-[50px] h-[50px] bg-[#182168] border border-white/20 rounded-[14px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg" title="Virtual Station">
         <i class="fa-solid fa-compass text-lg"></i>
       </button>
-
-      <!-- Virtual Station Popup (Figma: node 4538-886) -->
-      <div id="compassDropdown"
-           class="fixed right-[80px] top-[262px] w-[231px] bg-[#182168] rounded-[16px] shadow-[0_16px_48px_rgba(24,33,104,0.35)] z-[9999] opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-right overflow-hidden"
-           role="dialog" aria-label="Virtual Station">
-
-        <!-- Card Body -->
-        <div class="px-[18px] pt-[16px] pb-[18px] space-y-[10px]">
-
-          <!-- Title + Close row -->
-          <div class="flex items-center justify-between mb-[2px]">
-            <h3 class="text-white font-bold text-[14px] leading-tight tracking-tight">Virtual Station</h3>
-            <button id="compassCloseBtn" class="w-6 h-6 rounded-[6px] bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shrink-0" title="Close">
-              <i class="fa-solid fa-xmark text-[11px]"></i>
-            </button>
-          </div>
-
-          <!-- Longitude field -->
-          <div>
-            <label for="compassLonInput" class="text-white/70 text-[11px] font-medium mb-[5px] block">Longitude</label>
-            <div id="compassLonWrap" class="vs-input-wrap">
-              <input id="compassLonInput" type="number" step="any" min="-180" max="180"
-                     placeholder="-180 to 180"
-                     class="vs-input" />
-              <div class="vs-spinner" aria-hidden="true">
-                <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLonInput" data-dir="up"><i class="fa-solid fa-chevron-up text-[8px]"></i></button>
-                <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLonInput" data-dir="down"><i class="fa-solid fa-chevron-down text-[8px]"></i></button>
-              </div>
-            </div>
-            <p id="compassLonError" class="text-[10px] text-red-300 mt-1 hidden">Must be between -180 and 180.</p>
-          </div>
-
-          <!-- Latitude field -->
-          <div>
-            <label for="compassLatInput" class="text-white/70 text-[11px] font-medium mb-[5px] block">Latitude</label>
-            <div id="compassLatWrap" class="vs-input-wrap">
-              <input id="compassLatInput" type="number" step="any" min="-90" max="90"
-                     placeholder="-90 to 90"
-                     class="vs-input" />
-              <div class="vs-spinner" aria-hidden="true">
-                <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLatInput" data-dir="up"><i class="fa-solid fa-chevron-up text-[8px]"></i></button>
-                <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLatInput" data-dir="down"><i class="fa-solid fa-chevron-down text-[8px]"></i></button>
-              </div>
-            </div>
-            <p id="compassLatError" class="text-[10px] text-red-300 mt-1 hidden">Must be between -90 and 90.</p>
-          </div>
-
-          <!-- Go button -->
-          <button id="compassGoBtn"
-                  class="w-full h-[38px] bg-[#3a7fdb] hover:bg-[#2d6cc9] text-white rounded-[10px] text-[13px] font-semibold transition-all flex items-center justify-center mt-[2px]">
-            Go
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- Crosshair trigger -->
@@ -629,6 +628,46 @@
     <button id="layersPanelBtn" class="w-[50px] h-[50px] bg-[#182168] rounded-[16px] text-white flex items-center justify-center hover:bg-[#182168]/90 transition-all shadow-lg cursor-pointer" title="Data Layers">
       <i class="fa-solid fa-layer-group text-lg"></i>
     </button>
+  </div>
+
+  <!-- Mobile Right Action Rail (visible < 768px) -->
+  <div id="mobileActionRail" class="mobile-action-rail fixed right-2 top-[68px] z-40 flex flex-col gap-2 items-center md:hidden">
+    <!-- Cluster A: Time + Weather -->
+    <div class="mobile-action-cluster flex flex-col gap-1">
+      <button class="mobile-action-btn" title="System Time">
+        <i class="fa-regular fa-clock text-[14px]"></i>
+      </button>
+      <button class="mobile-action-btn" title="Weather Info">
+        <i class="fa-solid fa-cloud text-[14px]"></i>
+      </button>
+    </div>
+    <!-- Cluster B: Compass + Locate -->
+    <div class="mobile-action-cluster flex flex-col gap-1">
+      <button id="mobileCompassBtn" class="mobile-action-btn" title="Virtual Station">
+        <i class="fa-solid fa-compass text-[14px]"></i>
+      </button>
+      <button class="mobile-action-btn" title="Catalogue Overlay">
+        <i class="fa-solid fa-crosshairs text-[14px]"></i>
+      </button>
+    </div>
+    <!-- Cluster C: Zoom -->
+    <div class="mobile-action-cluster flex flex-col gap-1">
+      <button id="mobileZoomInBtn" class="mobile-action-btn" title="Zoom In">
+        <i class="fa-solid fa-magnifying-glass-plus text-[14px]"></i>
+      </button>
+      <button id="mobileZoomOutBtn" class="mobile-action-btn" title="Zoom Out">
+        <i class="fa-solid fa-magnifying-glass-minus text-[14px]"></i>
+      </button>
+    </div>
+    <!-- Cluster D: Layers -->
+    <div class="mobile-action-cluster flex flex-col gap-1">
+      <button id="mobileLayersBtn" class="mobile-action-btn" title="Data Layers">
+        <i class="fa-solid fa-layer-group text-[14px]"></i>
+      </button>
+      <button id="mobileDataLayersBtn" class="mobile-action-btn" title="Data Layers Panel">
+        <i class="fa-solid fa-bars-staggered text-[14px]"></i>
+      </button>
+    </div>
   </div>
 
   <!-- Figma: Filters + Catalogue overlay (opened by Crosshair button) -->
@@ -759,7 +798,11 @@
 
 
   <!-- Bottom Panel (Figma: Playback & Wave Chart) -->
-  <div id="mapBottomPanel" class="map-bottom-panel absolute left-[84px] z-0 bottom-[20px] right-[20px] max-w-[93%] flex flex-col gap-[9px] pointer-events-auto">
+  <div id="mapBottomPanel" class="map-bottom-panel absolute left-[84px] z-0 bottom-[20px] right-[20px] max-w-[93%] flex flex-col gap-[9px] pointer-events-auto md:left-[84px] md:bottom-[20px] md:right-[20px]">
+    <!-- Mobile Bottom Sheet Handle (visible < 768px) -->
+    <div id="mobileBottomHandle" class="mobile-bottom-handle flex items-center justify-center py-1 md:hidden cursor-pointer">
+      <div class="w-[36px] h-[4px] rounded-full bg-white/40"></div>
+    </div>
     <!-- Playback Timeline toolbar -->
     <div class="flex gap-[9px] items-center w-full">
       <!-- Play/Pause Button -->
@@ -1153,6 +1196,61 @@
           Load More
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Virtual Station Popup (Figma: node 4538-886) - Standalone for both desktop & mobile -->
+  <div id="compassBackdrop" class="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200"></div>
+  <div id="compassDropdown"
+       class="compass-dropdown fixed right-[80px] top-[262px] w-[231px] bg-[#182168] rounded-[16px] shadow-[0_16px_48px_rgba(24,33,104,0.35)] z-[9999] opacity-0 scale-95 pointer-events-none transition-all duration-200 origin-top-right overflow-hidden"
+       role="dialog" aria-label="Virtual Station">
+
+    <!-- Card Body -->
+    <div class="px-[18px] pt-[16px] pb-[18px] space-y-[10px]">
+
+      <!-- Title + Close row -->
+      <div class="flex items-center justify-between mb-[2px]">
+        <h3 class="text-white font-bold text-[14px] leading-tight tracking-tight">Virtual Station</h3>
+        <button id="compassCloseBtn" class="w-8 h-8 rounded-[8px] bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shrink-0" title="Close">
+          <i class="fa-solid fa-xmark text-[13px]"></i>
+        </button>
+      </div>
+
+      <!-- Longitude field -->
+      <div>
+        <label for="compassLonInput" class="text-white/70 text-[11px] font-medium mb-[5px] block">Longitude</label>
+        <div id="compassLonWrap" class="vs-input-wrap">
+          <input id="compassLonInput" type="number" step="any" min="-180" max="180"
+                 placeholder="-180 to 180"
+                 class="vs-input" />
+          <div class="vs-spinner" aria-hidden="true">
+            <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLonInput" data-dir="up"><i class="fa-solid fa-chevron-up text-[8px]"></i></button>
+            <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLonInput" data-dir="down"><i class="fa-solid fa-chevron-down text-[8px]"></i></button>
+          </div>
+        </div>
+        <p id="compassLonError" class="text-[10px] text-red-300 mt-1 hidden">Must be between -180 and 180.</p>
+      </div>
+
+      <!-- Latitude field -->
+      <div>
+        <label for="compassLatInput" class="text-white/70 text-[11px] font-medium mb-[5px] block">Latitude</label>
+        <div id="compassLatWrap" class="vs-input-wrap">
+          <input id="compassLatInput" type="number" step="any" min="-90" max="90"
+                 placeholder="-90 to 90"
+                 class="vs-input" />
+          <div class="vs-spinner" aria-hidden="true">
+            <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLatInput" data-dir="up"><i class="fa-solid fa-chevron-up text-[8px]"></i></button>
+            <button type="button" class="vs-spin-btn" tabindex="-1" data-target="compassLatInput" data-dir="down"><i class="fa-solid fa-chevron-down text-[8px]"></i></button>
+          </div>
+        </div>
+        <p id="compassLatError" class="text-[10px] text-red-300 mt-1 hidden">Must be between -90 and 90.</p>
+      </div>
+
+      <!-- Go button -->
+      <button id="compassGoBtn"
+              class="w-full h-[38px] bg-[#3a7fdb] hover:bg-[#2d6cc9] text-white rounded-[10px] text-[13px] font-semibold transition-all flex items-center justify-center mt-[2px]">
+        Go
+      </button>
     </div>
   </div>
 

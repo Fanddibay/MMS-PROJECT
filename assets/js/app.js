@@ -746,11 +746,14 @@ if (bottomToggle) {
 
   compassBackdrop?.addEventListener('click', closeDropdown);
 
+  const mobileCompassBtnRef = document.getElementById('mobileCompassBtn');
+
   // Close on outside click
   document.addEventListener('click', (e) => {
     if (isOpen && compassDropdown && !compassDropdown.contains(e.target)
         && !(compassBtn && compassBtn.contains(e.target))
-        && !(windBtn && windBtn.contains(e.target))) {
+        && !(windBtn && windBtn.contains(e.target))
+        && !(mobileCompassBtnRef && mobileCompassBtnRef.contains(e.target))) {
       closeDropdown();
     }
   });
@@ -1123,5 +1126,160 @@ if (typeof flatpickr !== "undefined") {
       });
     });
   }
+})();
+
+// ============================================================
+// MOBILE INTERACTION LOGIC
+// ============================================================
+(function () {
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+  const mobileSearchBar = document.getElementById('mobileSearchBar');
+  const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+  const leftSidebar = document.getElementById('leftSidebar');
+  const mobileNotifBtn = document.getElementById('mobileNotifBtn');
+  const mobileCompassBtn = document.getElementById('mobileCompassBtn');
+  const mobileZoomInBtn = document.getElementById('mobileZoomInBtn');
+  const mobileZoomOutBtn = document.getElementById('mobileZoomOutBtn');
+  const mobileLayersBtn = document.getElementById('mobileLayersBtn');
+  const mobileDataLayersBtn = document.getElementById('mobileDataLayersBtn');
+  const mobileBottomHandle = document.getElementById('mobileBottomHandle');
+  const mapBottomPanel = document.getElementById('mapBottomPanel');
+
+  if (!mobileMenuBtn) return;
+
+  // --- Mobile Sidebar Drawer ---
+  let mobileSidebarOpen = false;
+
+  function openMobileSidebar() {
+    mobileSidebarOpen = true;
+    leftSidebar?.classList.add('mobile-sidebar-open');
+    mobileSidebarOverlay?.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      mobileSidebarOverlay?.classList.add('is-visible');
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileSidebar() {
+    mobileSidebarOpen = false;
+    leftSidebar?.classList.remove('mobile-sidebar-open');
+    mobileSidebarOverlay?.classList.remove('is-visible');
+    setTimeout(() => {
+      mobileSidebarOverlay?.classList.add('hidden');
+    }, 280);
+    document.body.style.overflow = '';
+  }
+
+  mobileMenuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mobileSidebarOpen ? closeMobileSidebar() : openMobileSidebar();
+  });
+
+  mobileSidebarOverlay?.addEventListener('click', closeMobileSidebar);
+
+  // Close sidebar on nav item click (mobile)
+  leftSidebar?.addEventListener('click', (e) => {
+    if (window.innerWidth >= 768) return;
+    const btn = e.target.closest('button');
+    if (btn && mobileSidebarOpen && !btn.id?.includes('Menu')) {
+      // Allow the button's original handler to fire, then close drawer
+      setTimeout(closeMobileSidebar, 150);
+    }
+  });
+
+  // --- Mobile Search Toggle ---
+  let mobileSearchOpen = false;
+
+  mobileSearchToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mobileSearchOpen = !mobileSearchOpen;
+    if (mobileSearchOpen) {
+      mobileSearchBar?.classList.remove('hidden');
+      const input = mobileSearchBar?.querySelector('input');
+      setTimeout(() => input?.focus(), 200);
+    } else {
+      mobileSearchBar?.classList.add('hidden');
+    }
+  });
+
+  // Close search when clicking outside
+  document.addEventListener('click', (e) => {
+    if (mobileSearchOpen && mobileSearchBar && !mobileSearchBar.contains(e.target) && !mobileSearchToggle.contains(e.target)) {
+      mobileSearchOpen = false;
+      mobileSearchBar.classList.add('hidden');
+    }
+  });
+
+  // --- Mobile Notification Button ---
+  mobileNotifBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    // Trigger the desktop notification dropdown
+    const notifBtn = document.getElementById('notificationBtn');
+    if (notifBtn) notifBtn.click();
+    // Or open the all-notifications modal directly
+    if (typeof window.openAllNotifModal === 'function') {
+      window.openAllNotifModal();
+    }
+  });
+
+  // --- Mobile Compass Button ---
+  mobileCompassBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const compassBtn = document.getElementById('compassBtn');
+    if (compassBtn) compassBtn.click();
+  });
+
+  // --- Mobile Zoom Buttons ---
+  mobileZoomInBtn?.addEventListener('click', () => {
+    if (map) map.zoomIn({ duration: 250 });
+  });
+
+  mobileZoomOutBtn?.addEventListener('click', () => {
+    if (map) map.zoomOut({ duration: 250 });
+  });
+
+  // --- Mobile Layers Button (Add Layer Modal) ---
+  mobileLayersBtn?.addEventListener('click', () => {
+    const layersPanelBtn = document.getElementById('layersPanelBtn');
+    if (layersPanelBtn) layersPanelBtn.click();
+  });
+
+  // --- Mobile Data Layers Button (Left Panel) ---
+  mobileDataLayersBtn?.addEventListener('click', () => {
+    const sidebarHomeBtn = document.getElementById('sidebarHomeBtn');
+    if (sidebarHomeBtn) sidebarHomeBtn.click();
+  });
+
+  // --- Mobile Bottom Sheet Toggle ---
+  let mobileBottomCollapsed = false;
+
+  mobileBottomHandle?.addEventListener('click', () => {
+    if (!mapBottomPanel) return;
+    mobileBottomCollapsed = !mobileBottomCollapsed;
+    mapBottomPanel.classList.toggle('mobile-bottom-collapsed', mobileBottomCollapsed);
+  });
+
+  // --- Close mobile sidebar on resize to desktop ---
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768 && mobileSidebarOpen) {
+      closeMobileSidebar();
+    }
+    if (window.innerWidth >= 768 && mobileSearchOpen) {
+      mobileSearchOpen = false;
+      mobileSearchBar?.classList.add('hidden');
+    }
+  });
+
+  // --- Close mobile elements on Escape ---
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (mobileSidebarOpen) closeMobileSidebar();
+      if (mobileSearchOpen) {
+        mobileSearchOpen = false;
+        mobileSearchBar?.classList.add('hidden');
+      }
+    }
+  });
 })();
 
