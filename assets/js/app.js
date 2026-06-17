@@ -205,6 +205,9 @@ function setLayersOpen(open) {
   if (!panel) return;
 
   if (open) {
+    // Close user profile panel if open
+    setProfileOpen(false);
+
     panel.classList.remove("-translate-x-[400px]", "opacity-0", "pointer-events-none");
     panel.classList.add("translate-x-0", "opacity-100", "pointer-events-auto");
     if (backdrop) {
@@ -224,6 +227,26 @@ function setLayersOpen(open) {
   }
 
   syncSidebarLayersActive(open);
+  panel.setAttribute("aria-hidden", String(!open));
+}
+
+function setProfileOpen(open) {
+  const panel = document.getElementById("userProfilePanel");
+  if (!panel) return;
+
+  if (open) {
+    // Close data layers panel if open
+    setLayersOpen(false);
+
+    panel.classList.remove("-translate-x-[400px]", "opacity-0", "pointer-events-none");
+    panel.classList.add("translate-x-0", "opacity-100", "pointer-events-auto");
+    document.body.classList.add("user-profile-open");
+    setBottomChartCollapsed(false);
+  } else {
+    panel.classList.add("-translate-x-[400px]", "opacity-0", "pointer-events-none");
+    panel.classList.remove("translate-x-0", "opacity-100", "pointer-events-auto");
+    document.body.classList.remove("user-profile-open");
+  }
   panel.setAttribute("aria-hidden", String(!open));
 }
 
@@ -589,18 +612,28 @@ const layersPanelBtn = document.getElementById("layersPanelBtn");
 const dataLayerCloseBtn = document.getElementById("dataLayerCloseBtn");
 const dataLayersBackdrop = document.getElementById("dataLayersBackdrop");
 
+// User Profile triggers
+const sidebarProfileBtn = document.getElementById("sidebarProfileBtn");
+const userProfileCloseBtn = document.getElementById("userProfileCloseBtn");
+const userProfileCancelBtn = document.getElementById("userProfileCancelBtn");
+const userProfileLogoutBtn = document.getElementById("userProfileLogoutBtn");
+
 if (sidebarHomeBtn) {
   sidebarHomeBtn.addEventListener("click", () => {
     const panel = document.getElementById("dataLayersPanel");
     const isOpen = panel && !panel.classList.contains("opacity-0");
     setLayersOpen(!isOpen);
+ 
   });
+} else{
+  
 }
 
 if (layersPanelBtn) {
   layersPanelBtn.addEventListener("click", () => {
     const isOpen = addLayerModalWrapper && !addLayerModalWrapper.classList.contains("opacity-0");
     setAddLayerModalOpen(!isOpen);
+    
   });
 }
 
@@ -611,6 +644,40 @@ if (dataLayerCloseBtn) {
 if (dataLayersBackdrop) {
   dataLayersBackdrop.addEventListener("click", () => setLayersOpen(false));
 }
+
+if (sidebarProfileBtn) {
+  sidebarProfileBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const panel = document.getElementById("userProfilePanel");
+    const isOpen = panel && !panel.classList.contains("opacity-0");
+    setProfileOpen(!isOpen);
+  });
+}
+
+if (userProfileCloseBtn) {
+  userProfileCloseBtn.addEventListener("click", () => setProfileOpen(false));
+}
+
+if (userProfileCancelBtn) {
+  userProfileCancelBtn.addEventListener("click", () => setProfileOpen(false));
+}
+
+if (userProfileLogoutBtn) {
+  userProfileLogoutBtn.addEventListener("click", () => {
+    window.location.href = "login.html";
+  });
+}
+
+// Click outside handler for userProfilePanel
+document.addEventListener("click", (e) => {
+  const panel = document.getElementById("userProfilePanel");
+  const btn = document.getElementById("sidebarProfileBtn");
+  if (panel && !panel.classList.contains("opacity-0")) {
+    if (!panel.contains(e.target) && (!btn || !btn.contains(e.target))) {
+      setProfileOpen(false);
+    }
+  }
+});
 
 
 // Data layer checkboxes (Figma: parameter rows with sparklines)
@@ -657,6 +724,11 @@ function onGlobalEscape(e) {
   if (e.key !== "Escape") return;
   if (addLayerModalWrapper && !addLayerModalWrapper.classList.contains("opacity-0")) {
     setAddLayerModalOpen(false);
+    return;
+  }
+  const userPanel = document.getElementById("userProfilePanel");
+  if (userPanel && !userPanel.classList.contains("opacity-0")) {
+    setProfileOpen(false);
     return;
   }
   const panel = document.getElementById("dataLayersPanel");
@@ -800,7 +872,7 @@ if (bottomToggle) {
   lonInput?.addEventListener('input', validateLon);
   latInput?.addEventListener('input', validateLat);
 
-  // Go button: fly map to entered coordinates
+  // Go button: fly map to entered coordinates and show result
   compassGoBtn?.addEventListener('click', () => {
     const lonOk = validateLon();
     const latOk = validateLat();
@@ -817,7 +889,27 @@ if (bottomToggle) {
     if (typeof map !== 'undefined' && map && map.flyTo) {
       map.flyTo({ center: [lon, lat], zoom: 8, duration: 1500 });
     }
-    closeDropdown();
+
+    // Show result card with coordinates
+    const resultCard = document.getElementById('vsResultCard');
+    const resultCoords = document.getElementById('vsResultCoords');
+    if (resultCard && resultCoords) {
+      resultCoords.textContent = `${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E`;
+      resultCard.classList.remove('hidden');
+    }
+  });
+
+  // Close result card
+  document.getElementById('vsResultCloseBtn')?.addEventListener('click', () => {
+    document.getElementById('vsResultCard')?.classList.add('hidden');
+  });
+
+  // Clear & Set New button
+  document.getElementById('vsResultClearBtn')?.addEventListener('click', () => {
+    document.getElementById('vsResultCard')?.classList.add('hidden');
+    if (lonInput) lonInput.value = '';
+    if (latInput) latInput.value = '';
+    lonInput?.focus();
   });
 })();
 
@@ -1214,10 +1306,8 @@ if (typeof flatpickr !== "undefined") {
   // --- Mobile Notification Button ---
   mobileNotifBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
-    // Trigger the desktop notification dropdown
-    const notifBtn = document.getElementById('notificationBtn');
-    if (notifBtn) notifBtn.click();
-    // Or open the all-notifications modal directly
+    // On mobile, open the all-notifications modal directly
+    // (dropdown is inside hidden desktop toolbar, so it can't show on mobile)
     if (typeof window.openAllNotifModal === 'function') {
       window.openAllNotifModal();
     }
