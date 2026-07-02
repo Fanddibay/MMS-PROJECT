@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Presentation - BMKG Maritime Monitoring System</title>
+  <meta name="description" content="Configure Dynamic Presentation Mode with automated looping dashboard views for kiosk display.">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="assets/js/tailwind.config.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Dashboard CSS -->
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f4f5f9;
+    }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    /* ============================================================ */
+    /* Slide Tabs                                                   */
+    /* ============================================================ */
+    .slide-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+    }
+    .slide-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(24,33,104,0.18);
+    }
+    /* Figma: active slide has a vivid green ring */
+    .slide-card.active {
+      box-shadow: 0 0 0 4px #2ecc71, 0 10px 26px rgba(24,33,104,0.28);
+    }
+    .slide-card.add-card {
+      border: 2px dashed #cbd5e1 !important;
+      background: #fff;
+    }
+    .slide-card.add-card:hover {
+      border-color: #1a4999 !important;
+      background: #f0f4ff;
+    }
+
+    /* ============================================================ */
+    /* Theme swatches (config picker)                               */
+    /* ============================================================ */
+    .theme-swatch { cursor: pointer; transition: transform 0.2s ease; position: relative; }
+    .theme-swatch:hover { transform: scale(1.05); }
+    .theme-swatch .swatch-box {
+      width: 150px; height: 100px; border-radius: 12px; overflow: hidden;
+      position: relative; box-shadow: 0 2px 6px rgba(24,33,104,0.12);
+    }
+    .theme-swatch.selected::after {
+      content: '';
+      position: absolute; inset: -4px; top: -4px;
+      height: 108px; width: 158px;
+      border-radius: 16px; border: 2.5px solid #1a4999; pointer-events: none;
+    }
+    /* Mini wave inside grid-wave swatches */
+    .sw-wave { position: absolute; inset: 0; }
+    .sw-dots { position:absolute; inset:0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px);
+      background-size: 12px 12px; }
+    .sw-dots.dark { background-image: radial-gradient(circle, rgba(20,29,90,0.18) 1px, transparent 1px); }
+
+    /* ============================================================ */
+    /* Layout options                                               */
+    /* ============================================================ */
+    .layout-option {
+      cursor: pointer; transition: all 0.2s ease; border: 2px solid #e2e8f0;
+    }
+    .layout-option:hover { border-color: #94a3b8; background: #f8fafc; }
+    .layout-option.selected { border-color: #1a4999 !important; background: #eff4ff; }
+    .layout-option .lo-cell { border: 2px solid #1a4999; opacity: 0.45; border-radius: 3px; transition: opacity .2s; }
+    .layout-option.selected .lo-cell { opacity: 0.85; }
+
+    /* ============================================================ */
+    /* Form inputs                                                  */
+    /* ============================================================ */
+    .form-input {
+      border: 1px solid #a3a3a9; border-radius: 12px; padding: 16px; font-size: 14px;
+      color: #27272a; background: #fff; outline: none; width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
+    }
+    .form-input:focus { border-color: #1a4999; box-shadow: 0 0 0 3px rgba(26,73,153,0.1); }
+    .form-input::placeholder { color: #a1a1aa; }
+    .form-label {
+      color: #71717a; font-size: 15px; font-weight: 400; margin-bottom: 8px;
+      display: block; font-family: 'Inter', sans-serif;
+    }
+
+    /* ============================================================ */
+    /* Preview card — THEME ENGINE                                  */
+    /* Every visual token is a CSS variable; changing [data-theme]  */
+    /* on the card (or the Show overlay) re-skins the whole preview  */
+    /* AND the map, with smooth transitions.                        */
+    /* ============================================================ */
+    .preview-card,
+    #overlayStage {
+      /* --- default = Solid Navy --- */
+      --pv-bg: #141d5a;
+      --pv-title: #ffffff;
+      --pv-sub: #a5adc9;
+      --pv-logo-invert: 0.05;
+      --sd-bg: #283068;
+      --sd-border: #3c4790;
+      --sd-head: #1a4999;
+      --sd-label: #c8d0e6;
+      --sd-value: #ffffff;
+      --sd-trend: #c1f17e;
+      --sd-icon: #d6dde6;
+      --map-ocean: #bcdcf3;
+      --map-land: #f2f8ff;
+      --map-graticule: rgba(24,33,90,0.06);
+      --wave-c1: transparent;
+      --wave-c2: transparent;
+      --wave-opacity: 0;
+      --dots-color: transparent;
+    }
+    .preview-card {
+      background: var(--pv-bg); border-radius: 20px;
+      position: relative; overflow: hidden;
+      transition: background 0.5s ease;
+    }
+
+    /* ---- Theme definitions ---- */
+    [data-theme="solid-green"] {
+      --pv-bg: #12572b; --pv-sub: #bfe6c8;
+      --sd-bg: #1a7a3c; --sd-border: #3fae63; --sd-head: #0d8a3c;
+      --sd-trend: #eaffc4; --sd-icon: #d6f2dd;
+      --map-ocean: #bfe6c8; --map-land: #f3fbf2;
+      --map-graticule: rgba(16,80,40,0.07);
+    }
+    [data-theme="grid-wave"] {
+      --pv-bg: #0a0f1c; --pv-sub: #9aa7c7;
+      --sd-bg: rgba(255,255,255,0.05); --sd-border: rgba(255,255,255,0.12);
+      --sd-head: rgba(74,110,220,0.85); --sd-label: #aeb9d6; --sd-icon: #aeb9d6;
+      --map-ocean: #0e1b33; --map-land: #4a628f;
+      --map-graticule: rgba(255,255,255,0.05);
+      --wave-c1: #5b8bff; --wave-c2: #b072ff; --wave-opacity: 0.9;
+      --dots-color: rgba(255,255,255,0.10);
+    }
+    [data-theme="grid-wave2"] {
+      --pv-bg: #eef2fb; --pv-title: #141d5a; --pv-sub: #5a6da0; --pv-logo-invert: 0;
+      --sd-bg: #ffffff; --sd-border: #d5def5; --sd-head: #6d3bd4;
+      --sd-label: #5a6da0; --sd-value: #1e2a55; --sd-trend: #1f9d55; --sd-icon: #6d3bd4;
+      --map-ocean: #dbe6fb; --map-land: #b9c9ee;
+      --map-graticule: rgba(24,33,90,0.06);
+      --wave-c1: #ff4fd8; --wave-c2: #22d3ee; --wave-opacity: 0.85;
+      --dots-color: rgba(24,33,90,0.10);
+    }
+    [data-theme="gradient-blue"] {
+      --pv-bg: linear-gradient(135deg,#0b2f6b 0%,#0e5a8a 48%,#16b6c9 100%);
+      --pv-sub: #c7e6f2;
+      --sd-bg: rgba(255,255,255,0.10); --sd-border: rgba(255,255,255,0.22);
+      --sd-head: rgba(11,47,107,0.55); --sd-icon: #e2f3fb;
+      --map-ocean: #0d3b66; --map-land: #a9d3f0;
+      --map-graticule: rgba(255,255,255,0.06);
+    }
+    [data-theme="gradient-warm"] {
+      --pv-bg: radial-gradient(130% 130% at 28% 35%,#c2410c 0%,#7c2d8a 55%,#241946 100%);
+      --pv-sub: #f3d9c8;
+      --sd-bg: rgba(255,255,255,0.10); --sd-border: rgba(255,255,255,0.22);
+      --sd-head: rgba(124,45,138,0.5); --sd-icon: #f6e3d6;
+      --map-ocean: #2a1f3d; --map-land: #e0b48c;
+      --map-graticule: rgba(255,255,255,0.06);
+    }
+
+    /* ---- Decorative wave / dot layer (grid themes) ---- */
+    .pv-wave-layer {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+      opacity: var(--wave-opacity); transition: opacity 0.5s ease; z-index: 0;
+    }
+    .pv-wave-layer .pvw { width: 160%; height: 100%; }
+    .pvw path { transition: fill 0.5s ease; }
+    .pvw-1 { animation: waveFloatA 14s ease-in-out infinite; }
+    .pvw-2 { animation: waveFloatB 18s ease-in-out infinite; }
+    @keyframes waveFloatA { 0%,100%{transform:translate(-4%,0)} 50%{transform:translate(-8%,-2%)} }
+    @keyframes waveFloatB { 0%,100%{transform:translate(-6%,1%)} 50%{transform:translate(-2%,-3%)} }
+    .pv-dots {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(circle, var(--dots-color) 1px, transparent 1px);
+      background-size: 22px 22px; transition: background-image 0.5s ease;
+    }
+    .preview-inner { position: relative; z-index: 1; }
+
+    /* ============================================================ */
+    /* Map component (themeable via mask)                           */
+    /* ocean = container background · land = masked colour layer     */
+    /* ============================================================ */
+    .map-canvas {
+      position: relative; overflow: hidden; border-radius: 14px;
+      background: var(--map-ocean); transition: background 0.5s ease;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 -30px 60px rgba(0,0,0,0.18);
+    }
+    .map-graticule {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(var(--map-graticule) 1px, transparent 1px),
+        linear-gradient(90deg, var(--map-graticule) 1px, transparent 1px);
+      background-size: 7.14% 12.5%, 7.14% 12.5%;  /* ~15° graticule */
+      transition: background-image 0.5s ease;
+    }
+    .map-land {
+      position: absolute; inset: 0; background: var(--map-land);
+      -webkit-mask: url("assets/img/world-map.svg") center / cover no-repeat;
+              mask: url("assets/img/world-map.svg") center / cover no-repeat;
+      -webkit-mask-mode: alpha; mask-mode: alpha;
+      transition: background 0.5s ease;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+    }
+    /* When the SVG is injected inline (served over http) we drop the mask
+       and colour the paths directly — crisper and mask-safe on every browser. */
+    .map-land.has-inline { background: transparent; -webkit-mask: none; mask: none; color: var(--map-land); transition: color 0.5s ease; }
+    .map-land.has-inline svg { width: 100%; height: 100%; display: block; }
+    .map-land.has-inline svg path { fill: var(--map-land); transition: fill 0.5s ease; }
+    .map-vignette {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(2,6,23,0.10), rgba(2,6,23,0) 32%, rgba(2,6,23,0.22));
+    }
+    /* Station marker + label */
+    .map-marker { position: absolute; transform: translate(-50%,-50%); z-index: 3; }
+    .marker-dot {
+      width: 12px; height: 12px; border-radius: 9999px;
+      border: 2px solid #fff; box-shadow: 0 0 0 4px rgba(255,255,255,0.25), 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .marker-dot::after {
+      content: ''; position: absolute; inset: -3px; border-radius: 9999px;
+      border: 2px solid currentColor; animation: markerPing 2s cubic-bezier(0,0,0.2,1) infinite;
+    }
+    @keyframes markerPing { 0%{transform:scale(1);opacity:.7} 80%,100%{transform:scale(2.6);opacity:0} }
+    .marker-label {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      white-space: nowrap; font-size: 10px; font-weight: 700; color: #fff;
+      background: rgba(15,20,45,0.72); padding: 2px 7px; border-radius: 6px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ============================================================ */
+    /* Station data cards (themeable)                               */
+    /* ============================================================ */
+    .station-data-card {
+      background: var(--sd-bg); border: 1px solid var(--sd-border); border-radius: 18px;
+      backdrop-filter: blur(6px);
+      transition: background 0.5s ease, border-color 0.5s ease, transform 0.25s ease;
+    }
+    .station-data-card:hover { transform: translateY(-2px); }
+    .station-header-bar {
+      background: var(--sd-head); border-radius: 9px; padding: 4px 12px; font-size: 11px;
+      color: #fff; font-weight: 600; display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.5s ease;
+    }
+    .metric-label { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 10px; color: var(--sd-label); }
+    .metric-value { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--sd-value); line-height: 1.15; }
+    .metric-trend { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 10px; color: var(--sd-trend); }
+    .metric-icon { color: var(--sd-icon); }
+
+    /* ============================================================ */
+    /* Preview body layout engine ([data-layout])                  */
+    /* ============================================================ */
+    .pv-body { display: flex; flex-direction: column; gap: 12px; transition: gap 0.35s ease; }
+    .pv-map { position: relative; width: 100%; }
+    .pv-map .map-canvas { width: 100%; height: 100%; }
+    .pv-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; transition: all 0.35s ease; }
+
+    .pv-body[data-layout="1"] .pv-map .map-canvas { aspect-ratio: 16 / 6; }
+    /* L2 — split: map left, cards stacked right */
+    .pv-body[data-layout="2"] { flex-direction: row; align-items: stretch; }
+    .pv-body[data-layout="2"] .pv-map { flex: 1.7 1 0; }
+    .pv-body[data-layout="2"] .pv-map .map-canvas { height: 100%; min-height: 330px; }
+    .pv-body[data-layout="2"] .pv-cards { flex: 1 1 0; grid-template-columns: 1fr; align-content: start; }
+    /* L3 — cards on top, map below */
+    .pv-body[data-layout="3"] { flex-direction: column-reverse; }
+    .pv-body[data-layout="3"] .pv-map .map-canvas { aspect-ratio: 16 / 6; }
+    /* L4 — full-bleed map, cards overlaid at bottom */
+    .pv-body[data-layout="4"] { position: relative; }
+    .pv-body[data-layout="4"] .pv-map .map-canvas { aspect-ratio: 16 / 7.5; }
+    .pv-body[data-layout="4"] .pv-cards { position: absolute; left: 12px; right: 12px; bottom: 12px; }
+    .pv-body[data-layout="4"] .station-data-card { background: color-mix(in srgb, var(--sd-bg) 82%, transparent); }
+
+    @media (max-width: 767px) {
+      .pv-body[data-layout] { flex-direction: column !important; }
+      .pv-cards { grid-template-columns: 1fr !important; }
+      .pv-body[data-layout="4"] .pv-cards { position: static; }
+      .main-content { padding: 16px; }
+    }
+
+    /* ============================================================ */
+    /* Show / Kiosk overlay                                         */
+    /* ============================================================ */
+    #previewOverlay { display: none; position: fixed; inset: 0; z-index: 9999; animation: fadeIn 0.3s ease; }
+    #overlayStage { position: absolute; inset: 0; background: var(--pv-bg); overflow: hidden; transition: background 0.5s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    /* In fullscreen the map should grow to fill available height */
+    #overlayStage .pv-body { flex: 1; min-height: 0; }
+    #overlayStage .pv-body[data-layout="1"] .pv-map,
+    #overlayStage .pv-body[data-layout="3"] .pv-map { flex: 1; }
+    #overlayStage .pv-body[data-layout="1"] .pv-map .map-canvas,
+    #overlayStage .pv-body[data-layout="3"] .pv-map .map-canvas { aspect-ratio: auto; height: 100%; min-height: 0; }
+    #overlayStage .pv-body[data-layout="4"] .pv-map .map-canvas { aspect-ratio: auto; height: 100%; }
+
+    /* ---- Toast ---- */
+    #toast {
+      position: fixed; bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1e2a6e; color: #fff; padding: 12px 24px; border-radius: 12px;
+      font-size: 14px; font-weight: 500; z-index: 10000; opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ---- Entrance animations ---- */
+    @keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .anim-rise { animation: riseIn 0.5s cubic-bezier(0.2,0.9,0.2,1) both; }
+  </style>
+</head>
+<body>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- ============================================================ -->
+  <!-- Mobile Header (< md) -->
+  <!-- ============================================================ -->
+  <header class="fixed top-0 left-0 right-0 z-50 h-[56px] bg-[#182168] flex items-center px-3 gap-2 shadow-lg md:hidden">
+    <a href="index.html" class="w-[40px] h-[40px] rounded-[10px] text-white/80 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all shrink-0" title="Back">
+      <i class="fa-solid fa-arrow-left text-[16px]"></i>
+    </a>
+    <a href="dashboard.html" class="flex items-center gap-2 shrink-0" title="BMKG">
+      <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="h-[28px] w-auto object-contain" />
+    </a>
+    <div class="flex items-center gap-2 min-w-0 flex-1">
+      <span class="font-bold text-white text-[13px] truncate">Dynamic Presentation</span>
+    </div>
+    <button id="previewBtnMobile" class="w-[40px] h-[40px] rounded-[10px] bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all shrink-0" title="Preview">
+      <i class="fa-solid fa-play text-[13px]"></i>
+    </button>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- Page Layout -->
+  <!-- ============================================================ -->
+  <div class="flex min-h-screen">
+
+    <!-- ---- Left Sidebar (md+) ---- -->
+    <aside id="leftSidebar" class="fixed left-0 top-0 bottom-0 z-30 w-[62px] bg-[#182168] border-r border-[#0e1629] flex flex-col items-center py-6 justify-between h-screen shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.25)] hidden md:flex">
+      <div class="flex flex-col gap-6 items-center w-full">
+        <a href="dashboard.html" class="h-[46px] w-[36px] flex items-center justify-center shrink-0 mb-4" title="Main Dashboard">
+          <img src="assets/img/logo-bmkg-white.png" alt="BMKG" class="w-full h-auto object-contain" />
+        </a>
+        <a href="index.html" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Dashboard">
+          <i class="fa-solid fa-house text-[16px]"></i>
+          <span class="sidebar-nav-label">Dashboard</span>
+        </a>
+        <a href="#" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Weather Forecast">
+          <i class="fa-solid fa-cloud-sun text-[16px]"></i>
+          <span class="sidebar-nav-label">Weather</span>
+        </a>
+        <a href="#" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Stations">
+          <i class="fa-solid fa-map-marker-alt text-[16px]"></i>
+          <span class="sidebar-nav-label">Stations</span>
+        </a>
+        <a href="create-station.html" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] bg-white/15 text-white flex items-center justify-center transition-all" title="Dynamic Presentation">
+          <i class="fa-solid fa-file-circle-plus text-[16px]"></i>
+          <span class="sidebar-nav-label">Presentation</span>
+        </a>
+        <a href="#" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Maps">
+          <i class="fa-solid fa-map text-[16px]"></i>
+          <span class="sidebar-nav-label">Maps</span>
+        </a>
+        <a href="#" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Global View">
+          <i class="fa-solid fa-globe text-[16px]"></i>
+          <span class="sidebar-nav-label">Global</span>
+        </a>
+        <a href="#" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Alerts">
+          <i class="fa-solid fa-comment-dots text-[16px]"></i>
+          <span class="sidebar-nav-label">Alerts</span>
+        </a>
+        <div class="w-[36px] h-px bg-white/10 my-1"></div>
+        <a href="#" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Ocean Waves">
+          <i class="fa-solid fa-water text-[16px]"></i>
+          <span class="sidebar-nav-label">Waves</span>
+        </a>
+        <a href="#" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Maritime">
+          <i class="fa-solid fa-anchor text-[16px]"></i>
+          <span class="sidebar-nav-label">Maritime</span>
+        </a>
+        <a href="#" class="sidebar-nav-item w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Vessels">
+          <i class="fa-solid fa-ship text-[16px]"></i>
+          <span class="sidebar-nav-label">Vessels</span>
+        </a>
+      </div>
+      <div class="flex flex-col gap-4 items-center w-full">
+        <button id="themeToggle" class="w-[36px] h-[36px] rounded-[10px] text-white/70 hover:bg-white/10 hover:text-white flex items-center justify-center transition-all" title="Toggle Theme">
+          <i class="fa-solid fa-moon text-base"></i>
+        </button>
+        <button id="sidebarProfileBtn" class="w-[36px] h-[36px] rounded-full overflow-hidden border border-white/20 hover:border-white transition-all flex items-center justify-center" title="User Profile">
+          <i class="fa-solid fa-circle-user text-[28px] text-white/95"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ============================================================ -->
+    <!-- Main Content -->
+    <!-- ============================================================ -->
+    <main class="flex-1 md:ml-[62px] pt-[56px] md:pt-0 min-h-screen">
+
+      <!-- Page Header -->
+      <div class="bg-white border-b border-slate-200 px-6 py-5">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <h1 class="text-[24px] font-bold text-[#182168] tracking-tight" style="font-family:'Plus Jakarta Sans',sans-serif">Dynamic Presentation</h1>
+          <button id="showBtn" class="px-5 h-[36px] bg-[#1a4999] hover:bg-[#182168] text-white rounded-[10px] text-[13px] font-semibold transition-all flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-play text-[11px]"></i>
+            Show
+          </button>
+        </div>
+      </div>
+
+      <!-- Slide Tabs Row -->
+      <div class="bg-white border-b border-slate-100 px-6 py-5 ">
+        <div class="flex gap-4 overflow-x-auto no-scrollbar py-4 px-2" id="slideTabsRow">
+          <button class="slide-card active rounded-[14px] min-w-[180px] h-[110px] flex items-center justify-center px-4 border-0 relative shrink-0 overflow-hidden text-white" style="background:#141d5a" data-slide="1">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/8 to-transparent pointer-events-none"></div>
+            <span class="text-[14px] font-semibold leading-snug text-center z-10">Tanjung Priok Port<br>Situation</span>
+          </button>
+          <button class="slide-card rounded-[14px] min-w-[180px] h-[110px] flex items-center justify-center px-4 border-0 relative shrink-0 overflow-hidden text-white/90" style="background:#26307a" data-slide="2">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/8 to-transparent pointer-events-none"></div>
+            <span class="text-[14px] font-semibold leading-snug text-center z-10">Surabaya Port<br>Situation</span>
+          </button>
+          <button class="slide-card rounded-[14px] min-w-[180px] h-[110px] flex items-center justify-center px-4 border-0 relative shrink-0 overflow-hidden text-white/90" style="background:#3a4796" data-slide="3">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/8 to-transparent pointer-events-none"></div>
+            <span class="text-[14px] font-semibold leading-snug text-center z-10">Weather<br>Forecast</span>
+          </button>
+          <button class="slide-card add-card rounded-[14px] min-w-[150px] h-[110px] flex items-center justify-center px-4 shrink-0" id="addSlideBtn" title="Add new slide">
+            <div class="w-[46px] h-[46px] rounded-full bg-slate-100 flex items-center justify-center transition-all">
+              <i class="fa-solid fa-plus text-[18px] text-slate-400"></i>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- Configuration Panel -->
+      <!-- ============================================================ -->
+      <div class="main-content p-6 max-w-[1400px] mx-auto">
+        <div class="bg-white rounded-[20px] border border-slate-100 shadow-sm overflow-hidden">
+
+          <!-- Card Header -->
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <span class="text-[16px] font-semibold text-[#71717a]" id="currentSlideLabel">Tanjung Priok Port</span>
+            <button id="editSlideBtn" class="px-5 h-[34px] bg-[#1a4999] hover:bg-[#182168] text-white rounded-[10px] text-[12px] font-semibold transition-all flex items-center gap-2">
+              <i class="fa-solid fa-pen text-[10px]"></i>
+              Edit
+            </button>
+          </div>
+
+          <!-- Configuration Body -->
+          <div class="p-6 space-y-6">
+
+            <!-- Dashboard Title -->
+            <div>
+              <label class="form-label">Dashboard Title</label>
+              <input id="dashboardTitle" type="text" class="form-input" placeholder="Tanjung Priok Port Ocean and Weather Forecasting" value="Tanjung Priok Port Ocean and Weather Forecasting">
+            </div>
+
+            <!-- Theme (grouped: Solid · Grid Wave · Gradient) -->
+            <div>
+              <label class="form-label">Theme</label>
+              <div class="flex gap-8 flex-wrap" id="themeGroups">
+
+                <!-- Group: Solid -->
+                <div class="flex flex-col gap-3">
+                  <span class="text-[13px] text-slate-500 font-medium">Solid</span>
+                  <div class="flex gap-5">
+                    <div class="theme-swatch selected" data-theme="solid-navy">
+                      <div class="swatch-box" style="background:#1a2160"></div>
+                    </div>
+                    <div class="theme-swatch" data-theme="solid-green">
+                      <div class="swatch-box" style="background:#37a24e"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Group: Grid Wave -->
+                <div class="flex flex-col gap-3">
+                  <span class="text-[13px] text-slate-500 font-medium">Grid Wave</span>
+                  <div class="flex gap-5">
+                    <div class="theme-swatch" data-theme="grid-wave">
+                      <div class="swatch-box" style="background:#0a0f1c">
+                        <div class="sw-dots"></div>
+                        <svg class="sw-wave" viewBox="0 0 150 100" preserveAspectRatio="none">
+                          <defs><linearGradient id="swg1" x1="0" y1="1" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#5b8bff"/><stop offset="100%" stop-color="#b072ff"/>
+                          </linearGradient></defs>
+                          <path d="M-10 62 Q35 30 80 55 Q120 76 160 42 L160 100 L-10 100Z" fill="url(#swg1)" opacity="0.55"/>
+                          <path d="M-10 78 Q45 50 90 68 Q130 84 160 58 L160 100 L-10 100Z" fill="url(#swg1)" opacity="0.4"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="theme-swatch" data-theme="grid-wave2">
+                      <div class="swatch-box" style="background:#eef2fb">
+                        <div class="sw-dots dark"></div>
+                        <svg class="sw-wave" viewBox="0 0 150 100" preserveAspectRatio="none">
+                          <defs><linearGradient id="swg2" x1="0" y1="1" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#ff4fd8"/><stop offset="100%" stop-color="#22d3ee"/>
+                          </linearGradient></defs>
+                          <path d="M-10 55 Q40 25 85 48 Q130 70 160 40 L160 74 Q120 92 80 74 Q40 58 -10 84Z" fill="url(#swg2)" opacity="0.8"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Group: Gradient -->
+                <div class="flex flex-col gap-3">
+                  <span class="text-[13px] text-slate-500 font-medium">Gradient</span>
+                  <div class="flex gap-5">
+                    <div class="theme-swatch" data-theme="gradient-blue">
+                      <div class="swatch-box" style="background:linear-gradient(135deg,#0b2f6b 0%,#0e5a8a 48%,#16b6c9 100%)"></div>
+                    </div>
+                    <div class="theme-swatch" data-theme="gradient-warm">
+                      <div class="swatch-box" style="background:radial-gradient(130% 130% at 28% 35%,#c2410c 0%,#7c2d8a 55%,#241946 100%)"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Logo -->
+            <div>
+              <label class="form-label">Logo</label>
+              <div class="flex items-end gap-4">
+                <div id="logoPreview" class="w-[120px] h-[60px] rounded-[10px] bg-white border border-slate-200 flex items-center justify-center overflow-hidden shadow-sm">
+                  <img src="assets/img/logo-bmkg-white.png" alt="Logo" id="logoImg" class="h-[40px] w-auto object-contain" style="filter: invert(0.1);">
+                </div>
+                <div>
+                  <label for="logoUpload" class="cursor-pointer px-4 h-[34px] rounded-[10px] border border-slate-300 text-[12px] text-slate-500 hover:border-[#1a4999] hover:text-[#1a4999] transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-upload text-[11px]"></i>
+                    Upload Image
+                  </label>
+                  <input type="file" id="logoUpload" accept="image/*" class="hidden">
+                </div>
+              </div>
+            </div>
+
+            <!-- Layout -->
+            <div>
+              <label class="form-label">Layout</label>
+              <div class="flex gap-4 flex-wrap" id="layoutGroup">
+                <!-- L1: map top + 3 cards row -->
+                <div class="layout-option selected rounded-[10px] w-[150px] h-[100px] p-2 flex flex-col gap-1.5" data-layout="1" title="Map on top, cards below">
+                  <div class="lo-cell flex-1 w-full"></div>
+                  <div class="flex gap-1.5 h-[26px]">
+                    <div class="lo-cell flex-1"></div><div class="lo-cell flex-1"></div><div class="lo-cell flex-1"></div>
+                  </div>
+                </div>
+                <!-- L2: map left + cards stacked right -->
+                <div class="layout-option rounded-[10px] w-[150px] h-[100px] p-2 flex gap-1.5" data-layout="2" title="Split: map left, cards right">
+                  <div class="lo-cell flex-[1.6]"></div>
+                  <div class="flex flex-col gap-1.5 flex-1">
+                    <div class="lo-cell flex-1"></div><div class="lo-cell flex-1"></div><div class="lo-cell flex-1"></div>
+                  </div>
+                </div>
+                <!-- L3: cards top + map -->
+                <div class="layout-option rounded-[10px] w-[150px] h-[100px] p-2 flex flex-col gap-1.5" data-layout="3" title="Cards on top, map below">
+                  <div class="flex gap-1.5 h-[26px]">
+                    <div class="lo-cell flex-1"></div><div class="lo-cell flex-1"></div><div class="lo-cell flex-1"></div>
+                  </div>
+                  <div class="lo-cell flex-1 w-full"></div>
+                </div>
+                <!-- L4: full map, overlaid cards -->
+                <div class="layout-option rounded-[10px] w-[150px] h-[100px] p-2 relative" data-layout="4" title="Full map, cards overlaid">
+                  <div class="lo-cell w-full h-full"></div>
+                  <div class="absolute left-3 right-3 bottom-3 flex gap-1.5 h-[22px]">
+                    <div class="lo-cell flex-1 !opacity-90" style="background:#fff;border-color:#1a4999"></div>
+                    <div class="lo-cell flex-1 !opacity-90" style="background:#fff;border-color:#1a4999"></div>
+                    <div class="lo-cell flex-1 !opacity-90" style="background:#fff;border-color:#1a4999"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Datetime / Slide Duration -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label class="form-label">Datetime</label>
+                <input id="presentationDate" type="text" class="form-input" placeholder="5 May 2026  09:00 WIB" value="5 May 2026  09:00 WIB">
+              </div>
+              <div>
+                <label class="form-label">Slide Duration</label>
+                <select id="slideDuration" class="form-input appearance-none cursor-pointer">
+                  <option value="30">30 seconds</option>
+                  <option value="60" selected>1 minute</option>
+                  <option value="120">2 minutes</option>
+                  <option value="180">3 minutes</option>
+                  <option value="300">5 minutes</option>
+                  <option value="600">10 minutes</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- LIVE PREVIEW (themeable)                                     -->
+            <!-- ============================================================ -->
+            <div class="preview-card p-5 md:p-6" id="previewCard" data-theme="solid-navy">
+
+              <!-- decorative layers (grid themes) -->
+              <div class="pv-dots"></div>
+              <div class="pv-wave-layer">
+                <svg class="pvw" viewBox="0 0 1440 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="pvwG" x1="0" y1="1" x2="1" y2="0">
+                      <stop offset="0%" stop-color="var(--wave-c1)"/>
+                      <stop offset="100%" stop-color="var(--wave-c2)"/>
+                    </linearGradient>
+                  </defs>
+                  <path class="pvw-1" d="M-40 150 Q300 60 720 130 Q1140 200 1480 90 L1480 260 L-40 260Z" fill="url(#pvwG)" opacity="0.45"/>
+                  <path class="pvw-2" d="M-40 195 Q360 110 760 175 Q1160 235 1480 140 L1480 260 L-40 260Z" fill="url(#pvwG)" opacity="0.3"/>
+                </svg>
+              </div>
+
+              <div class="preview-inner">
+                <!-- Header row -->
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="w-[72px] h-[72px] bg-white rounded-[16px] flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                    <img src="assets/img/logo-bmkg-white.png" alt="Logo" id="previewLogoImg" class="w-[50px] h-auto object-contain" style="filter: invert(0.05)">
+                  </div>
+                  <div>
+                    <p class="font-semibold text-[20px] md:text-[24px] leading-tight" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--pv-title)" id="previewTitle">Tanjung Priok Port Ocean and Weather Forecasting</p>
+                    <p class="text-[14px] mt-1" style="color:var(--pv-sub)" id="previewDate">5 May 2026  09:00 WIB</p>
+                  </div>
+                </div>
+
+                <!-- Body: map + station cards (layout-driven) -->
+                <div class="pv-body" data-layout="1" id="previewBody">
+                  <!-- MAP -->
+                  <div class="pv-map">
+                    <div class="map-canvas">
+                      <div class="map-graticule"></div>
+                      <div class="map-land"></div>
+                      <div class="map-vignette"></div>
+                      <!-- Station markers over Indonesia -->
+                      <div class="map-marker" style="left:78.5%;top:57%;color:#facc15">
+                        <div class="marker-dot" style="background:#facc15"></div>
+                        <span class="marker-label">Tanjung Priok</span>
+                      </div>
+                      <div class="map-marker" style="left:81%;top:59%;color:#22d3ee">
+                        <div class="marker-dot" style="background:#22d3ee"></div>
+                        <span class="marker-label">Surabaya</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- STATION CARDS -->
+                  <div class="pv-cards">
+                    <!-- Card 1 : primary metrics -->
+                    <div class="station-data-card p-3">
+                      <div class="station-header-bar mb-3">
+                        <span>Station Data</span>
+                        <span class="opacity-80 text-[10px]">(10/11/24, 9:12 PM WIB)</span>
+                      </div>
+                      <div class="grid grid-cols-2 gap-x-2 gap-y-3">
+                        <div>
+                          <div class="flex items-center gap-1 mb-1">
+                            <i class="fa-solid fa-temperature-half metric-icon text-[10px]"></i>
+                            <span class="metric-label">Air Temperature</span>
+                          </div>
+                          <div class="metric-value text-[20px]">51°C</div>
+                        </div>
+                        <div>
+                          <div class="flex items-center gap-1 mb-1">
+                            <i class="fa-solid fa-water metric-icon text-[10px]"></i>
+                            <span class="metric-label">Wave Height</span>
+                          </div>
+                          <div class="metric-value text-[20px]">0.6 m</div>
+                        </div>
+                        <div>
+                          <div class="flex items-center gap-1 mb-1">
+                            <i class="fa-solid fa-location-arrow metric-icon text-[10px]"></i>
+                            <span class="metric-label">Wind Direction</span>
+                          </div>
+                          <div class="metric-value text-[20px]">40°</div>
+                        </div>
+                        <div>
+                          <div class="flex items-center gap-1 mb-1">
+                            <i class="fa-solid fa-arrows-rotate metric-icon text-[10px]"></i>
+                            <span class="metric-label">Wave Direction</span>
+                          </div>
+                          <div class="metric-value text-[20px]">325°</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Card 2 : surface conditions -->
+                    <div class="station-data-card p-3">
+                      <div class="station-header-bar mb-3">
+                        <span>Station Data</span>
+                        <span class="opacity-80 text-[10px]">(10/11/24, 9:12 PM WIB)</span>
+                      </div>
+                      <div class="grid grid-cols-3 gap-x-1 gap-y-2">
+                        <div class="flex flex-col items-center text-center">
+                          <i class="fa-solid fa-gauge metric-icon text-[13px] mb-1"></i>
+                          <span class="metric-label block leading-tight">Surface Air Pressure</span>
+                          <div class="metric-value text-[11px] mt-1">1020.7 hPa</div>
+                          <span class="metric-trend">▲ 5%</span>
+                        </div>
+                        <div class="flex flex-col items-center text-center">
+                          <i class="fa-solid fa-wind metric-icon text-[13px] mb-1"></i>
+                          <span class="metric-label block leading-tight">Wind Gust</span>
+                          <div class="metric-value text-[11px] mt-1">40°</div>
+                          <span class="metric-trend">▲ 5%</span>
+                        </div>
+                        <div class="flex flex-col items-center text-center">
+                          <i class="fa-solid fa-temperature-three-quarters metric-icon text-[13px] mb-1"></i>
+                          <span class="metric-label block leading-tight">Sea Surface Temp</span>
+                          <div class="metric-value text-[11px] mt-1">29.4 °C</div>
+                          <span class="metric-trend">▲ 5%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Card 3 : other metrics -->
+                    <div class="station-data-card p-3">
+                      <div class="station-header-bar mb-3">
+                        <span>Station Data</span>
+                        <span class="opacity-80 text-[10px]">(10/11/24, 9:12 PM WIB)</span>
+                      </div>
+                      <div class="grid grid-cols-3 gap-x-1 gap-y-2">
+                        <div class="flex flex-col items-center text-center">
+                          <i class="fa-solid fa-sun metric-icon text-[13px] mb-1"></i>
+                          <span class="metric-label block leading-tight">Sunshine Total</span>
+                          <div class="metric-value text-[11px] mt-1">15</div>
+                          <span class="metric-trend">▲ 5%</span>
+                        </div>
+                        <div class="flex flex-col items-center text-center">
+                          <i class="fa-solid fa-satellite-dish metric-icon text-[13px] mb-1"></i>
+                          <span class="metric-label block leading-tight">Reflectivity Max</span>
+                          <div class="metric-value text-[11px] mt-1">42 dBZ</div>
+                          <span class="metric-trend">▲ 5%</span>
+                        </div>
+                        <div class="flex flex-col items-center text-center">
+                          <i class="fa-solid fa-cloud-rain metric-icon text-[13px] mb-1"></i>
+                          <span class="metric-label block leading-tight">Rain Rate</span>
+                          <div class="metric-value text-[11px] mt-1">2.4 mm/h</div>
+                          <span class="metric-trend">▲ 5%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- /preview card -->
+
+          </div><!-- /config body -->
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center justify-end gap-3 px-6 pb-6 pt-2 border-t border-slate-100">
+            <button id="copyLinkBtn" class="px-5 h-[42px] bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-[10px] text-[13px] font-semibold transition-all flex items-center gap-2">
+              <i class="fa-solid fa-link text-[12px]"></i>
+              Copy Link
+            </button>
+            <button id="cancelBtn" class="px-5 h-[42px] bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-[10px] text-[13px] font-semibold transition-all">
+              Cancel
+            </button>
+            <button id="saveBtn" class="px-6 h-[42px] bg-[#1a4999] hover:bg-[#182168] text-white rounded-[10px] text-[13px] font-semibold transition-all shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-floppy-disk text-[12px]"></i>
+              Save Configuration
+            </button>
+          </div>
+
+        </div><!-- /white config card -->
+      </div><!-- /main-content -->
+    </main>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Full Preview Overlay (Kiosk / Show Mode) -->
+  <!-- ============================================================ -->
+  <div id="previewOverlay">
+    <div id="overlayStage" data-theme="solid-navy">
+      <!-- decorative layers -->
+      <div class="pv-dots"></div>
+      <div class="pv-wave-layer">
+        <svg class="pvw" viewBox="0 0 1440 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="pvwGO" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--wave-c1)"/>
+              <stop offset="100%" stop-color="var(--wave-c2)"/>
+            </linearGradient>
+          </defs>
+          <path class="pvw-1" d="M-40 150 Q300 60 720 130 Q1140 200 1480 90 L1480 260 L-40 260Z" fill="url(#pvwGO)" opacity="0.45"/>
+          <path class="pvw-2" d="M-40 195 Q360 110 760 175 Q1160 235 1480 140 L1480 260 L-40 260Z" fill="url(#pvwGO)" opacity="0.3"/>
+        </svg>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="absolute top-0 left-0 right-0 h-[3px] bg-white/10 z-20">
+        <div id="progressBar" class="h-full bg-white/80 transition-none" style="width:0%"></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="absolute top-4 right-4 z-20 flex items-center gap-3">
+        <div class="bg-black/30 backdrop-blur px-4 py-2 rounded-full text-white text-[12px] font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-circle text-green-400 text-[8px] animate-pulse"></i>
+          <span id="overlayViewLabel">View 1 of 3</span>
+        </div>
+        <div class="bg-black/30 backdrop-blur px-4 py-2 rounded-full text-white text-[12px] font-semibold">
+          <i class="fa-solid fa-clock mr-1.5 opacity-70"></i>
+          <span id="overlayTime">--:--:--</span>
+        </div>
+        <button id="exitPreviewBtn" class="w-[44px] h-[44px] rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all backdrop-blur">
+          <i class="fa-solid fa-xmark text-[20px]"></i>
+        </button>
+      </div>
+
+      <!-- Countdown -->
+      <div class="absolute top-4 left-4 z-20 bg-black/30 backdrop-blur px-4 py-2 rounded-full text-white text-[12px] font-semibold">
+        Next in <span id="countdownDisplay" class="font-bold ml-1">60s</span>
+      </div>
+
+      <!-- Content -->
+      <div class="h-full flex flex-col p-6 md:p-8 gap-5 relative z-10">
+        <!-- Header -->
+        <div class="flex items-center gap-4 shrink-0">
+          <div class="w-[70px] h-[70px] bg-white rounded-[16px] flex items-center justify-center shadow-sm overflow-hidden">
+            <img src="assets/img/logo-bmkg-white.png" alt="BMKG" id="overlayLogoImg" class="w-[48px] h-auto" style="filter:invert(0.05)">
+          </div>
+          <div>
+            <h2 class="text-[26px] md:text-[32px] font-bold leading-tight" style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--pv-title)" id="overlayTitle">Tanjung Priok Port Ocean and Weather Forecasting</h2>
+            <p class="text-[15px] mt-1" style="color:var(--pv-sub)" id="overlayDate">5 May 2026  09:00 WIB</p>
+          </div>
+        </div>
+
+        <!-- Body: reuses the same map + card component -->
+        <div class="pv-body flex-1 min-h-0" data-layout="1" id="overlayBody">
+          <div class="pv-map">
+            <div class="map-canvas">
+              <div class="map-graticule"></div>
+              <div class="map-land"></div>
+              <div class="map-vignette"></div>
+              <div class="map-marker" style="left:78.5%;top:57%;color:#facc15">
+                <div class="marker-dot" style="background:#facc15"></div>
+                <span class="marker-label">Tanjung Priok</span>
+              </div>
+              <div class="map-marker" style="left:81%;top:59%;color:#22d3ee">
+                <div class="marker-dot" style="background:#22d3ee"></div>
+                <span class="marker-label">Surabaya</span>
+              </div>
+            </div>
+          </div>
+          <div class="pv-cards">
+            <div class="station-data-card p-3 md:p-4">
+              <div class="station-header-bar mb-3"><span>Station Data</span><span class="opacity-80 text-[10px]">(10/11/24, 9:12 PM WIB)</span></div>
+              <div class="grid grid-cols-2 gap-3">
+                <div><div class="metric-label flex items-center gap-1"><i class="fa-solid fa-temperature-half metric-icon text-[10px]"></i> Air Temp</div><div class="metric-value text-[22px]">51°C</div></div>
+                <div><div class="metric-label flex items-center gap-1"><i class="fa-solid fa-water metric-icon text-[10px]"></i> Wave Height</div><div class="metric-value text-[22px]">0.6 m</div></div>
+                <div><div class="metric-label flex items-center gap-1"><i class="fa-solid fa-location-arrow metric-icon text-[10px]"></i> Wind Dir</div><div class="metric-value text-[22px]">40°</div></div>
+                <div><div class="metric-label flex items-center gap-1"><i class="fa-solid fa-arrows-rotate metric-icon text-[10px]"></i> Wave Dir</div><div class="metric-value text-[22px]">325°</div></div>
+              </div>
+            </div>
+            <div class="station-data-card p-3 md:p-4">
+              <div class="station-header-bar mb-3"><span>Station Data</span><span class="opacity-80 text-[10px]">(10/11/24, 9:12 PM WIB)</span></div>
+              <div class="grid grid-cols-3 gap-2">
+                <div class="text-center"><i class="fa-solid fa-gauge metric-icon text-[14px] mb-1 block"></i><div class="metric-label leading-tight">Surface Air Pressure</div><div class="metric-value text-[12px] mt-1">1020.7 hPa</div><div class="metric-trend">▲ 5%</div></div>
+                <div class="text-center"><i class="fa-solid fa-wind metric-icon text-[14px] mb-1 block"></i><div class="metric-label leading-tight">Wind Gust</div><div class="metric-value text-[12px] mt-1">40°</div><div class="metric-trend">▲ 5%</div></div>
+                <div class="text-center"><i class="fa-solid fa-temperature-three-quarters metric-icon text-[14px] mb-1 block"></i><div class="metric-label leading-tight">Sea Surface Temp</div><div class="metric-value text-[12px] mt-1">29.4 °C</div><div class="metric-trend">▲ 5%</div></div>
+              </div>
+            </div>
+            <div class="station-data-card p-3 md:p-4">
+              <div class="station-header-bar mb-3"><span>Station Data</span><span class="opacity-80 text-[10px]">(10/11/24, 9:12 PM WIB)</span></div>
+              <div class="grid grid-cols-3 gap-2">
+                <div class="text-center"><i class="fa-solid fa-sun metric-icon text-[14px] mb-1 block"></i><div class="metric-label leading-tight">Sunshine Total</div><div class="metric-value text-[12px] mt-1">15</div><div class="metric-trend">▲ 5%</div></div>
+                <div class="text-center"><i class="fa-solid fa-satellite-dish metric-icon text-[14px] mb-1 block"></i><div class="metric-label leading-tight">Reflectivity Max</div><div class="metric-value text-[12px] mt-1">42 dBZ</div><div class="metric-trend">▲ 5%</div></div>
+                <div class="text-center"><i class="fa-solid fa-cloud-rain metric-icon text-[14px] mb-1 block"></i><div class="metric-label leading-tight">Rain Rate</div><div class="metric-value text-[12px] mt-1">2.4 mm/h</div><div class="metric-trend">▲ 5%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /overlay content -->
+    </div><!-- /overlayStage -->
+  </div><!-- /previewOverlay -->
+
+
+  <!-- ============================================================ -->
+  <!-- Scripts -->
+  <!-- ============================================================ -->
+  <script>
+    /* ---- Toast helper ---- */
+    function showToast(msg, duration = 2400) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), duration);
+    }
+
+    const previewCard  = document.getElementById('previewCard');
+    const overlayStage = document.getElementById('overlayStage');
+    const previewBody  = document.getElementById('previewBody');
+    const overlayBody  = document.getElementById('overlayBody');
+
+    /* ---- Inline the world-map SVG for crisp, mask-safe, themeable land.
+       Falls back to the CSS mask automatically if fetch is blocked (file://). ---- */
+    fetch('assets/img/world-map.svg')
+      .then(r => r.ok ? r.text() : Promise.reject())
+      .then(svg => {
+        document.querySelectorAll('.map-land').forEach(el => {
+          el.innerHTML = svg;
+          el.classList.add('has-inline');
+        });
+      })
+      .catch(() => { /* keep CSS mask fallback */ });
+
+    /* ---- Slide tab switching ---- */
+    const slideLabels = { '1': 'Tanjung Priok Port', '2': 'Surabaya Port', '3': 'Weather Forecast' };
+    document.querySelectorAll('[data-slide]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-slide]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('currentSlideLabel').textContent = slideLabels[btn.dataset.slide] || 'Slide';
+      });
+    });
+
+    document.getElementById('addSlideBtn').addEventListener('click', () => {
+      showToast('New slide template will be added here.');
+    });
+
+    /* ============================================================ */
+    /* THEME ENGINE — selecting a swatch re-skins the preview + map */
+    /* ============================================================ */
+    function applyTheme(theme) {
+      previewCard.dataset.theme  = theme;
+      overlayStage.dataset.theme = theme;
+      document.querySelectorAll('.theme-swatch').forEach(s =>
+        s.classList.toggle('selected', s.dataset.theme === theme));
+    }
+    document.querySelectorAll('.theme-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        applyTheme(sw.dataset.theme);
+        showToast('Theme: ' + sw.dataset.theme.replace('-', ' '));
+      });
+    });
+
+    /* ============================================================ */
+    /* LAYOUT ENGINE — selecting a layout rearranges map + cards    */
+    /* ============================================================ */
+    function applyLayout(layout) {
+      previewBody.dataset.layout = layout;
+      overlayBody.dataset.layout = layout;
+      document.querySelectorAll('.layout-option').forEach(o =>
+        o.classList.toggle('selected', o.dataset.layout === layout));
+    }
+    document.querySelectorAll('.layout-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        applyLayout(opt.dataset.layout);
+        showToast('Layout ' + opt.dataset.layout + ' applied');
+      });
+    });
+
+    /* ---- Live title / date sync to preview + overlay ---- */
+    const titleInput = document.getElementById('dashboardTitle');
+    const dateInput  = document.getElementById('presentationDate');
+    titleInput.addEventListener('input', () => {
+      document.getElementById('previewTitle').textContent = titleInput.value;
+      document.getElementById('overlayTitle').textContent = titleInput.value;
+    });
+    dateInput.addEventListener('input', () => {
+      document.getElementById('previewDate').textContent = dateInput.value;
+      document.getElementById('overlayDate').textContent = dateInput.value;
+    });
+
+    /* ---- Logo upload — updates config, preview & overlay ---- */
+    document.getElementById('logoUpload').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const src = e.target.result;
+        ['logoImg', 'previewLogoImg', 'overlayLogoImg'].forEach(id => {
+          const img = document.getElementById(id);
+          if (img) { img.src = src; img.style.filter = 'none'; }
+        });
+        showToast('✓ Logo updated');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    /* ============================================================ */
+    /* Show / Preview overlay */
+    /* ============================================================ */
+    let previewInterval = null, clockInterval = null, countdownVal = 60;
+    const getDuration = () => parseInt(document.getElementById('slideDuration').value, 10);
+
+    function startPreview() {
+      const overlay = document.getElementById('previewOverlay');
+      overlay.style.display = 'block';
+      const total = getDuration();
+      countdownVal = total;
+      document.getElementById('countdownDisplay').textContent = total + 's';
+      document.getElementById('progressBar').style.width = '0%';
+
+      const tick = () => document.getElementById('overlayTime').textContent = new Date().toLocaleTimeString();
+      tick(); clockInterval = setInterval(tick, 1000);
+
+      let elapsed = 0, viewIdx = 0;
+      const views = ['Tanjung Priok Port', 'Surabaya Port', 'Weather Forecast'];
+      previewInterval = setInterval(() => {
+        elapsed++;
+        document.getElementById('countdownDisplay').textContent = (total - elapsed) + 's';
+        document.getElementById('progressBar').style.width = ((elapsed / total) * 100) + '%';
+        if (elapsed >= total) {
+          elapsed = 0;
+          viewIdx = (viewIdx + 1) % views.length;
+          document.getElementById('overlayViewLabel').textContent = `View ${viewIdx + 1} of ${views.length}`;
+          document.getElementById('progressBar').style.width = '0%';
+        }
+      }, 1000);
+
+      try { document.documentElement.requestFullscreen?.(); } catch (e) {}
+    }
+
+    function stopPreview() {
+      document.getElementById('previewOverlay').style.display = 'none';
+      clearInterval(previewInterval);
+      clearInterval(clockInterval);
+      if (document.fullscreenElement) { try { document.exitFullscreen?.(); } catch (e) {} }
+    }
+
+    document.getElementById('showBtn').addEventListener('click', startPreview);
+    document.getElementById('previewBtnMobile')?.addEventListener('click', startPreview);
+    document.getElementById('exitPreviewBtn').addEventListener('click', stopPreview);
+    document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) stopPreview(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') stopPreview(); });
+
+    /* ---- Edit ---- */
+    document.getElementById('editSlideBtn').addEventListener('click', () => {
+      showToast('Edit mode: make your changes and click Save.');
+      titleInput.focus();
+    });
+
+    /* ---- Save ---- */
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const config = {
+        title: titleInput.value || 'Untitled',
+        date: dateInput.value,
+        duration: document.getElementById('slideDuration').value,
+        theme: previewCard.dataset.theme,
+        layout: previewBody.dataset.layout,
+        logo: document.getElementById('logoImg').src,
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem('presentation_config', JSON.stringify(config));
+      showToast('✓ Configuration saved successfully!');
+    });
+
+    /* ---- Copy shareable link ---- */
+    document.getElementById('copyLinkBtn').addEventListener('click', () => {
+      const p = new URLSearchParams({
+        title: titleInput.value,
+        date: dateInput.value,
+        duration: document.getElementById('slideDuration').value,
+        theme: previewCard.dataset.theme,
+        layout: previewBody.dataset.layout
+      });
+      const url = `${window.location.origin}${window.location.pathname}?${p.toString()}`;
+      navigator.clipboard.writeText(url)
+        .then(() => showToast('✓ Link copied to clipboard!'))
+        .catch(() => {
+          const ta = document.createElement('textarea');
+          ta.value = url; document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta);
+          showToast('✓ Link copied to clipboard!');
+        });
+    });
+
+    /* ---- Cancel ---- */
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    /* ---- Restore from URL params or localStorage ---- */
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const saved = JSON.parse(localStorage.getItem('presentation_config') || '{}');
+      const get = k => params.get(k) ?? saved[k];
+
+      const t = get('title');
+      if (t) { titleInput.value = t; document.getElementById('previewTitle').textContent = t; document.getElementById('overlayTitle').textContent = t; }
+      const d = get('date');
+      if (d) { dateInput.value = d; document.getElementById('previewDate').textContent = d; document.getElementById('overlayDate').textContent = d; }
+      const dur = get('duration');
+      if (dur) document.getElementById('slideDuration').value = dur;
+      const th = get('theme');  if (th) applyTheme(th);
+      const lay = get('layout'); if (lay) applyLayout(lay);
+    });
+
+    /* ---- Page dark-mode toggle (admin chrome, not the preview) ---- */
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle?.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      themeToggle.querySelector('i').className = isDark ? 'fa-solid fa-sun text-base' : 'fa-solid fa-moon text-base';
+    });
+  </script>
+</body>
+</html>
