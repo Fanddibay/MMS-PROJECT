@@ -246,6 +246,8 @@ function setProfileOpen(open) {
     panel.classList.add("-translate-x-[400px]", "opacity-0", "pointer-events-none");
     panel.classList.remove("translate-x-0", "opacity-100", "pointer-events-auto");
     document.body.classList.remove("user-profile-open");
+    // Always reset back to read-only view when the panel closes
+    if (typeof setProfileEditMode === "function") setProfileEditMode(false);
   }
   panel.setAttribute("aria-hidden", String(!open));
 }
@@ -665,6 +667,85 @@ if (userProfileCancelBtn) {
 if (userProfileLogoutBtn) {
   userProfileLogoutBtn.addEventListener("click", () => {
     window.location.href = "login.html";
+  });
+}
+
+// --- User Profile: View <-> Edit mode (Figma 6254:1044) ---
+const userProfileEditBtn = document.getElementById("userProfileEditBtn");
+const userProfileViewMode = document.getElementById("userProfileViewMode");
+const userProfileEditMode = document.getElementById("userProfileEditMode");
+const userProfileDiscardBtn = document.getElementById("userProfileDiscardBtn");
+const userProfileNameInput = document.getElementById("userProfileNameInput");
+const userProfileEmailInput = document.getElementById("userProfileEmailInput");
+const userProfileRoleInput = document.getElementById("userProfileRoleInput");
+const userProfileViewName = document.getElementById("userProfileViewName");
+const userProfileViewEmail = document.getElementById("userProfileViewEmail");
+const userProfileViewRole = document.getElementById("userProfileViewRole");
+const userProfileHeaderName = document.getElementById("userProfileHeaderName");
+const userProfileHeaderEmail = document.getElementById("userProfileHeaderEmail");
+
+// Restart the fade/slide-in animation on whichever mode becomes visible
+function playProfileModeIn(el) {
+  if (!el) return;
+  el.classList.remove("profile-mode-in");
+  void el.offsetWidth; // force reflow so the animation replays
+  el.classList.add("profile-mode-in");
+}
+
+function setProfileEditMode(editing) {
+  if (!userProfileViewMode || !userProfileEditMode) return;
+
+  if (editing) {
+    // Seed the inputs from the current read-only values so nothing is lost
+    if (userProfileNameInput) userProfileNameInput.value = (userProfileViewName?.textContent || "").trim();
+    if (userProfileEmailInput) userProfileEmailInput.value = (userProfileViewEmail?.textContent || "").trim();
+    if (userProfileRoleInput) userProfileRoleInput.value = (userProfileViewRole?.textContent || "").trim();
+
+    userProfileViewMode.classList.add("hidden");
+    userProfileEditMode.classList.remove("hidden");
+    userProfileEditMode.classList.add("flex");
+    playProfileModeIn(userProfileEditMode);
+    userProfileEditBtn?.classList.add("text-[#1a4999]", "bg-slate-100");
+    userProfileNameInput?.focus();
+  } else {
+    userProfileEditMode.classList.add("hidden");
+    userProfileEditMode.classList.remove("flex", "profile-mode-in");
+    userProfileViewMode.classList.remove("hidden");
+    playProfileModeIn(userProfileViewMode);
+    userProfileEditBtn?.classList.remove("text-[#1a4999]", "bg-slate-100");
+  }
+}
+
+function saveProfileEdits() {
+  const name = (userProfileNameInput?.value || "").trim();
+  const email = (userProfileEmailInput?.value || "").trim();
+  const role = (userProfileRoleInput?.value || "").trim();
+
+  if (userProfileViewName && name) userProfileViewName.textContent = name;
+  if (userProfileViewEmail && email) userProfileViewEmail.textContent = email;
+  if (userProfileViewRole && role) userProfileViewRole.textContent = role;
+  if (userProfileHeaderName && name) userProfileHeaderName.textContent = name;
+  if (userProfileHeaderEmail && email) userProfileHeaderEmail.textContent = email;
+
+  setProfileEditMode(false);
+}
+
+if (userProfileEditBtn) {
+  userProfileEditBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isEditing = userProfileEditMode && !userProfileEditMode.classList.contains("hidden");
+    setProfileEditMode(!isEditing);
+  });
+}
+
+if (userProfileDiscardBtn) {
+  userProfileDiscardBtn.addEventListener("click", () => setProfileEditMode(false));
+}
+
+if (userProfileEditMode) {
+  userProfileEditMode.addEventListener("submit", (e) => {
+    e.preventDefault();
+    saveProfileEdits();
   });
 }
 

@@ -467,16 +467,29 @@
     </div>
   </div>
 
+  <!-- User Profile: view <-> edit mode-switch animation -->
+  <style>
+    @keyframes profileModeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .profile-mode-in { animation: profileModeIn 260ms cubic-bezier(0.2, 0.9, 0.2, 1); }
+  </style>
+
   <!-- Sliding User Profile Panel -->
   <div id="userProfilePanel" class="fixed inset-y-0 left-0 sm:left-[78px] top-0 sm:top-[20px] bottom-0 sm:bottom-[20px] z-40 w-full sm:w-[360px] bg-white text-slate-800 rounded-none sm:rounded-[20px] shadow-[0_10px_25px_rgba(24,33,104,0.15)] flex flex-col transition-all duration-300 transform -translate-x-[400px] opacity-0 pointer-events-none">
     
     <!-- Panel Shell (inner scrollable content container) -->
     <div class="flex flex-col h-full overflow-hidden p-6 relative">
       
-      <!-- Close Button -->
-      <button id="userProfileCloseBtn" class="w-8 h-8 absolute top-6 right-6 flex items-center justify-center text-slate-800 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors" title="Close Panel">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
+      <!-- Header Actions: Edit + Close -->
+      <div class="absolute top-6 right-6 flex items-center gap-1 z-10">
+        <!-- Edit Button (enters edit mode) -->
+        <button id="userProfileEditBtn" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-[#1a4999] hover:bg-slate-100 rounded-full transition-colors" title="Edit Profile" aria-label="Edit profile">
+          <i class="fa-solid fa-pen text-[14px]"></i>
+        </button>
+        <!-- Close Button -->
+        <button id="userProfileCloseBtn" class="w-8 h-8 flex items-center justify-center text-slate-800 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors" title="Close Panel" aria-label="Close panel">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
 
       <!-- Profile Header -->
       <div class="flex flex-col gap-4 items-start w-full mt-4">
@@ -486,43 +499,84 @@
             <img id="userProfileAvatar" alt="John Snow" class="w-full h-full object-cover" src="assets/img/avatar-john-snow.png" />
           </div>
           <!-- Profile Name & Email -->
-          <div class="flex flex-col min-w-0">
-            <h3 class="font-bold text-[#1f2937] text-[16px] font-['Poppins'] truncate">John Snow</h3>
-            <span class="text-[#6b7280] text-[14px] font-['Poppins'] truncate">johnsnow@gmail.com</span>
+          <div class="flex flex-col min-w-0 pr-[64px]">
+            <h3 id="userProfileHeaderName" class="font-bold text-[#1f2937] text-[16px] font-['Poppins'] truncate">John Snow</h3>
+            <span id="userProfileHeaderEmail" class="text-[#6b7280] text-[14px] font-['Poppins'] truncate">johnsnow@gmail.com</span>
           </div>
         </div>
         <!-- Divider -->
         <hr class="w-full border-t border-[#e5e7eb] my-1" />
       </div>
 
-      <!-- Details List -->
-      <div class="flex flex-col gap-4 w-full mt-4 flex-1">
-        <!-- Name -->
-        <div class="flex flex-col gap-2 w-full">
-          <div class="flex items-center justify-between text-[12px] font-['Poppins']">
-            <span class="text-[#1f2937] font-medium">Name</span>
-            <span class="text-[#4b5563] font-semibold">John Snow</span>
+      <!-- Middle Area (scrollable): View mode <-> Edit mode -->
+      <div class="flex-1 w-full mt-4 overflow-y-auto -mr-2 pr-2">
+
+        <!-- VIEW MODE: read-only details -->
+        <div id="userProfileViewMode" class="flex flex-col gap-4 w-full">
+          <!-- Name -->
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex items-center justify-between gap-3 text-[12px] font-['Poppins']">
+              <span class="text-[#1f2937] font-medium shrink-0">Name</span>
+              <span id="userProfileViewName" class="text-[#4b5563] font-semibold truncate text-right">John Snow</span>
+            </div>
+            <hr class="w-full border-t border-[#f1f5f9]" />
           </div>
-          <hr class="w-full border-t border-[#f1f5f9]" />
+
+          <!-- Email -->
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex items-center justify-between gap-3 text-[12px] font-['Poppins']">
+              <span class="text-[#1f2937] font-medium shrink-0">Email Account</span>
+              <span id="userProfileViewEmail" class="text-[#4b5563] font-semibold truncate text-right">johnsnow@gmail.com</span>
+            </div>
+            <hr class="w-full border-t border-[#f1f5f9]" />
+          </div>
+
+          <!-- Role -->
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex items-center justify-between gap-3 text-[12px] font-['Poppins']">
+              <span class="text-[#1f2937] font-medium shrink-0">Role</span>
+              <span id="userProfileViewRole" class="text-[#4b5563] font-semibold truncate text-right">Register User</span>
+            </div>
+            <hr class="w-full border-t border-[#f1f5f9]" />
+          </div>
         </div>
 
-        <!-- Email -->
-        <div class="flex flex-col gap-2 w-full">
-          <div class="flex items-center justify-between text-[12px] font-['Poppins']">
-            <span class="text-[#1f2937] font-medium">Email Account</span>
-            <span class="text-[#4b5563] font-semibold">johnsnow@gmail.com</span>
+        <!-- EDIT MODE: editable form (Figma 6254:1044) -->
+        <form id="userProfileEditMode" class="hidden flex-col gap-[15px] w-full">
+          <!-- Name -->
+          <div class="flex flex-col gap-[3px] w-full">
+            <label for="userProfileNameInput" class="text-[12px] font-['Poppins'] text-black">Name</label>
+            <input id="userProfileNameInput" type="text" value="John Snow"
+              class="h-[35px] w-full rounded-[8px] border border-[#a9a9a9] bg-transparent px-3 text-[12px] font-['Poppins'] text-black placeholder:text-[#9ca3af] outline-none transition-colors focus:border-[#1a4999] focus:ring-2 focus:ring-[#1a4999]/15" />
           </div>
-          <hr class="w-full border-t border-[#f1f5f9]" />
-        </div>
 
-        <!-- Role -->
-        <div class="flex flex-col gap-2 w-full">
-          <div class="flex items-center justify-between text-[12px] font-['Poppins']">
-            <span class="text-[#1f2937] font-medium">Role</span>
-            <span class="text-[#4b5563] font-semibold">Register User</span>
+          <!-- Email Account -->
+          <div class="flex flex-col gap-[3px] w-full">
+            <label for="userProfileEmailInput" class="text-[12px] font-['Poppins'] text-black">Email Account</label>
+            <input id="userProfileEmailInput" type="email" value="johnsnow@gmail.com"
+              class="h-[35px] w-full rounded-[8px] border border-[#a9a9a9] bg-transparent px-3 text-[12px] font-['Poppins'] text-[#4b5563] placeholder:text-[#9ca3af] outline-none transition-colors focus:border-[#1a4999] focus:ring-2 focus:ring-[#1a4999]/15" />
           </div>
-          <hr class="w-full border-t border-[#f1f5f9]" />
-        </div>
+
+          <!-- Role -->
+          <div class="flex flex-col gap-[3px] w-full">
+            <label for="userProfileRoleInput" class="text-[12px] font-['Poppins'] text-black">Role</label>
+            <input id="userProfileRoleInput" type="text" value="Register User"
+              class="h-[35px] w-full rounded-[8px] border border-[#a9a9a9] bg-transparent px-3 text-[12px] font-['Poppins'] text-[#4b5563] placeholder:text-[#9ca3af] outline-none transition-colors focus:border-[#1a4999] focus:ring-2 focus:ring-[#1a4999]/15" />
+          </div>
+
+          <!-- Actions: Discard changes / Save -->
+          <div class="flex items-center gap-[10px] w-full mt-1">
+            <button type="button" id="userProfileDiscardBtn"
+              class="flex-1 h-[34px] rounded-[10px] border border-[#1a4999] bg-white text-[#1a4999] text-[12px] font-['Inter'] font-medium transition-colors hover:bg-[#f0f4fb] active:bg-[#e4ecf8]">
+              Discard changes
+            </button>
+            <button type="submit" id="userProfileSaveBtn"
+              class="flex-1 h-[34px] rounded-[10px] bg-[#1a4999] text-white text-[12px] font-['Inter'] font-semibold transition-colors hover:bg-[#153a7a] active:bg-[#182168]">
+              Save
+            </button>
+          </div>
+        </form>
+
       </div>
 
       <!-- Bottom Buttons -->
