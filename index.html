@@ -471,6 +471,11 @@
   <style>
     @keyframes profileModeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     .profile-mode-in { animation: profileModeIn 260ms cubic-bezier(0.2, 0.9, 0.2, 1); }
+    @keyframes avatarSwap { 0% { transform: scale(0.85); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+    .avatar-swap { animation: avatarSwap 300ms cubic-bezier(0.2, 0.9, 0.2, 1); }
+    @media (prefers-reduced-motion: reduce) {
+      .profile-mode-in, .avatar-swap { animation: none; }
+    }
   </style>
 
   <!-- Sliding User Profile Panel -->
@@ -494,9 +499,18 @@
       <!-- Profile Header -->
       <div class="flex flex-col gap-4 items-start w-full mt-4">
         <div class="flex gap-4 items-center w-full">
-          <!-- Profile Image -->
-          <div class="w-[70px] h-[70px] rounded-full overflow-hidden bg-slate-200 border-2 border-slate-100 shadow-sm shrink-0">
-            <img id="userProfileAvatar" alt="John Snow" class="w-full h-full object-cover" src="assets/img/avatar-john-snow.png" />
+          <!-- Profile Image (editable in edit mode) -->
+          <div class="relative w-[70px] h-[70px] shrink-0">
+            <div class="w-full h-full rounded-full overflow-hidden bg-slate-200 border-2 border-slate-100 shadow-sm">
+              <img id="userProfileAvatar" alt="Profile photo of John Snow" class="w-full h-full object-cover transition-transform duration-300" src="assets/img/avatar-john-snow.png" />
+            </div>
+            <!-- Change photo control (revealed only while editing) -->
+            <button type="button" id="userProfileAvatarBtn"
+              class="hidden absolute -bottom-1 -right-1 w-[26px] h-[26px] rounded-full bg-[#1a4999] hover:bg-[#153a7a] text-white ring-2 ring-white shadow-sm items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a4999] focus-visible:ring-offset-2"
+              title="Change profile photo" aria-label="Change profile photo">
+              <i class="fa-solid fa-camera text-[11px]"></i>
+            </button>
+            <input id="userProfileAvatarInput" type="file" accept="image/*" class="hidden" tabindex="-1" aria-hidden="true" />
           </div>
           <!-- Profile Name & Email -->
           <div class="flex flex-col min-w-0 pr-[64px]">
@@ -550,19 +564,31 @@
               class="h-[35px] w-full rounded-[8px] border border-[#a9a9a9] bg-transparent px-3 text-[12px] font-['Poppins'] text-black placeholder:text-[#9ca3af] outline-none transition-colors focus:border-[#1a4999] focus:ring-2 focus:ring-[#1a4999]/15" />
           </div>
 
-          <!-- Email Account -->
+          <!-- Email Account (locked / read-only) -->
           <div class="flex flex-col gap-[3px] w-full">
             <label for="userProfileEmailInput" class="text-[12px] font-['Poppins'] text-black">Email Account</label>
-            <input id="userProfileEmailInput" type="email" value="johnsnow@gmail.com"
-              class="h-[35px] w-full rounded-[8px] border border-[#a9a9a9] bg-transparent px-3 text-[12px] font-['Poppins'] text-[#4b5563] placeholder:text-[#9ca3af] outline-none transition-colors focus:border-[#1a4999] focus:ring-2 focus:ring-[#1a4999]/15" />
+            <div class="relative w-full">
+              <input id="userProfileEmailInput" type="email" value="johnsnow@gmail.com" readonly aria-readonly="true"
+                class="h-[35px] w-full rounded-[8px] border border-[#e5e7eb] bg-[#f4f4f5] pl-3 pr-9 text-[12px] font-['Poppins'] text-[#6b7280] outline-none cursor-not-allowed select-all" />
+              <i class="fa-solid fa-lock text-[#9ca3af] text-[11px] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            </div>
           </div>
 
-          <!-- Role -->
+          <!-- Role (locked / read-only) -->
           <div class="flex flex-col gap-[3px] w-full">
             <label for="userProfileRoleInput" class="text-[12px] font-['Poppins'] text-black">Role</label>
-            <input id="userProfileRoleInput" type="text" value="Register User"
-              class="h-[35px] w-full rounded-[8px] border border-[#a9a9a9] bg-transparent px-3 text-[12px] font-['Poppins'] text-[#4b5563] placeholder:text-[#9ca3af] outline-none transition-colors focus:border-[#1a4999] focus:ring-2 focus:ring-[#1a4999]/15" />
+            <div class="relative w-full">
+              <input id="userProfileRoleInput" type="text" value="Register User" readonly aria-readonly="true"
+                class="h-[35px] w-full rounded-[8px] border border-[#e5e7eb] bg-[#f4f4f5] pl-3 pr-9 text-[12px] font-['Poppins'] text-[#6b7280] outline-none cursor-not-allowed select-all" />
+              <i class="fa-solid fa-lock text-[#9ca3af] text-[11px] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            </div>
           </div>
+
+          <!-- Helper: explains why email + role are locked -->
+          <p class="flex items-start gap-1.5 -mt-1 text-[11px] leading-snug font-['Poppins'] text-[#71717a]">
+            <i class="fa-solid fa-circle-info text-[10px] mt-[2px] shrink-0"></i>
+            <span>Email and role are managed by your administrator.</span>
+          </p>
 
           <!-- Actions: Discard changes / Save -->
           <div class="flex items-center gap-[10px] w-full mt-1">

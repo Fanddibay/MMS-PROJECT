@@ -683,6 +683,11 @@ const userProfileViewEmail = document.getElementById("userProfileViewEmail");
 const userProfileViewRole = document.getElementById("userProfileViewRole");
 const userProfileHeaderName = document.getElementById("userProfileHeaderName");
 const userProfileHeaderEmail = document.getElementById("userProfileHeaderEmail");
+const userProfileAvatar = document.getElementById("userProfileAvatar");
+const userProfileAvatarBtn = document.getElementById("userProfileAvatarBtn");
+const userProfileAvatarInput = document.getElementById("userProfileAvatarInput");
+// Snapshot of the avatar taken when editing begins, so Discard/Close can revert it
+let originalAvatarSrc = null;
 
 // Restart the fade/slide-in animation on whichever mode becomes visible
 function playProfileModeIn(el) {
@@ -696,16 +701,25 @@ function setProfileEditMode(editing) {
   if (!userProfileViewMode || !userProfileEditMode) return;
 
   if (editing) {
-    // Seed the inputs from the current read-only values so nothing is lost
+    // Seed the inputs from the current values (email + role are read-only, shown for context)
     if (userProfileNameInput) userProfileNameInput.value = (userProfileViewName?.textContent || "").trim();
     if (userProfileEmailInput) userProfileEmailInput.value = (userProfileViewEmail?.textContent || "").trim();
     if (userProfileRoleInput) userProfileRoleInput.value = (userProfileViewRole?.textContent || "").trim();
+
+    // Remember the current photo so Discard/Close can restore it
+    originalAvatarSrc = userProfileAvatar ? userProfileAvatar.src : null;
 
     userProfileViewMode.classList.add("hidden");
     userProfileEditMode.classList.remove("hidden");
     userProfileEditMode.classList.add("flex");
     playProfileModeIn(userProfileEditMode);
     userProfileEditBtn?.classList.add("text-[#1a4999]", "bg-slate-100");
+
+    // Reveal the "change photo" affordance and enlarge the tap area to the avatar
+    userProfileAvatarBtn?.classList.remove("hidden");
+    userProfileAvatarBtn?.classList.add("flex");
+    userProfileAvatar?.classList.add("cursor-pointer");
+
     userProfileNameInput?.focus();
   } else {
     userProfileEditMode.classList.add("hidden");
@@ -713,19 +727,23 @@ function setProfileEditMode(editing) {
     userProfileViewMode.classList.remove("hidden");
     playProfileModeIn(userProfileViewMode);
     userProfileEditBtn?.classList.remove("text-[#1a4999]", "bg-slate-100");
+
+    // Hide the photo control and discard any unsaved photo change
+    userProfileAvatarBtn?.classList.add("hidden");
+    userProfileAvatarBtn?.classList.remove("flex");
+    userProfileAvatar?.classList.remove("cursor-pointer");
+    if (userProfileAvatar && originalAvatarSrc) userProfileAvatar.src = originalAvatarSrc;
   }
 }
 
 function saveProfileEdits() {
+  // Only Name is editable; Email + Role are managed by the administrator (read-only)
   const name = (userProfileNameInput?.value || "").trim();
-  const email = (userProfileEmailInput?.value || "").trim();
-  const role = (userProfileRoleInput?.value || "").trim();
-
   if (userProfileViewName && name) userProfileViewName.textContent = name;
-  if (userProfileViewEmail && email) userProfileViewEmail.textContent = email;
-  if (userProfileViewRole && role) userProfileViewRole.textContent = role;
   if (userProfileHeaderName && name) userProfileHeaderName.textContent = name;
-  if (userProfileHeaderEmail && email) userProfileHeaderEmail.textContent = email;
+
+  // Commit the current photo as the new baseline so setProfileEditMode(false) keeps it
+  if (userProfileAvatar) originalAvatarSrc = userProfileAvatar.src;
 
   setProfileEditMode(false);
 }
@@ -746,6 +764,38 @@ if (userProfileEditMode) {
   userProfileEditMode.addEventListener("submit", (e) => {
     e.preventDefault();
     saveProfileEdits();
+  });
+}
+
+// --- Editable profile photo ---
+function isProfileEditing() {
+  return userProfileEditMode && !userProfileEditMode.classList.contains("hidden");
+}
+
+function openAvatarPicker(e) {
+  if (e) e.stopPropagation();
+  if (!isProfileEditing()) return; // only editable while in edit mode
+  userProfileAvatarInput?.click();
+}
+
+if (userProfileAvatarBtn) userProfileAvatarBtn.addEventListener("click", openAvatarPicker);
+if (userProfileAvatar) userProfileAvatar.addEventListener("click", openAvatarPicker);
+
+if (userProfileAvatarInput) {
+  userProfileAvatarInput.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (!userProfileAvatar) return;
+      userProfileAvatar.src = ev.target.result;
+      // subtle scale/fade so the swap reads as intentional
+      userProfileAvatar.classList.remove("avatar-swap");
+      void userProfileAvatar.offsetWidth;
+      userProfileAvatar.classList.add("avatar-swap");
+    };
+    reader.readAsDataURL(file);
+    e.target.value = ""; // allow re-selecting the same file
   });
 }
 
